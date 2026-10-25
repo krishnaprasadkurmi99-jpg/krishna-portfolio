@@ -52,6 +52,31 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="intro-screen" id="intro-screen" aria-hidden="true">
+    <div class="intro-circuit intro-circuit--one" aria-hidden="true"><span></span><i></i><b></b></div>
+    <div class="intro-circuit intro-circuit--two" aria-hidden="true"><span></span><i></i><b></b></div>
+    <div class="intro-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="intro-core" aria-hidden="true">
+      <div class="core-ring core-ring--outer"></div>
+      <div class="core-ring core-ring--inner"></div>
+      <div class="core-chip"><span>CPU</span><i></i><i></i><i></i><i></i></div>
+    </div>
+    <span class="intro-symbol intro-symbol--code" aria-hidden="true">&lt;/&gt;</span>
+    <span class="intro-symbol intro-symbol--braces" aria-hidden="true">{ }</span>
+    <span class="intro-cube intro-cube--one" aria-hidden="true"></span>
+    <span class="intro-cube intro-cube--two" aria-hidden="true"></span>
+    <div class="intro-panel intro-panel--cpp" aria-hidden="true"><small>LANGUAGE</small><strong>C++</strong><span>01 / logic</span></div>
+    <div class="intro-panel intro-panel--python" aria-hidden="true"><small>RUNTIME</small><strong>Python</strong><span>02 / systems</span></div>
+    <div class="intro-panel intro-panel--dsa" aria-hidden="true"><small>FOUNDATIONS</small><strong>DSA</strong><span>03 / structure</span></div>
+    <div class="intro-panel intro-panel--mongo" aria-hidden="true"><small>DATA</small><strong>MongoDB</strong><span>04 / scale</span></div>
+    <div class="intro-orbit intro-orbit--one" aria-hidden="true"></div>
+    <div class="intro-orbit intro-orbit--two" aria-hidden="true"></div>
+    <div class="intro-content">
+      <h1 class="intro-name" aria-label="Krishna Prasad Kurmi"><span>Krishna</span> <span>Prasad</span> <span>Kurmi</span></h1>
+      <span class="intro-rule" aria-hidden="true"></span>
+      <button class="intro-skip" id="intro-skip" type="button">Skip intro <span>↗</span></button>
+    </div>
+  </div>
   <div class="page-glow page-glow--top" aria-hidden="true"></div>
   <div class="page-glow page-glow--bottom" aria-hidden="true"></div>
 
@@ -69,17 +94,18 @@
         <a class="nav-link" href="#about">About</a>
         <a class="nav-link" href="#skills">Skills</a>
         <a class="nav-link" href="#projects">Projects</a>
+        <a class="nav-link" href="#journey">Education</a>
         <a class="nav-link" href="#contact">Contact</a>
         <a href="#contact" class="nav-cta">Let's Talk <span>↗</span></a>
       </div>
     </nav>
   </header>
 
-  <main id="home">
-    <section class="hero container">
+  <main>
+    <section class="hero container" id="home" aria-labelledby="home-title">
       <div class="hero-copy reveal">
         <p class="eyebrow"><span class="status-dot"></span> CSE STUDENT <b>•</b> CLASS OF 2029</p>
-        <h1>Hi, I'm <span class="gradient-text">Krishna.</span></h1>
+        <h1 id="home-title">Hi, I'm <span class="gradient-text">Krishna.</span></h1>
         <h2 class="hero-title">Building the logic behind great digital experiences.</h2>
         <p class="hero-intro">I'm a Computer Science and Engineering student passionate about backend development, problem-solving, and building reliable software systems.</p>
         <p class="hero-support">Currently strengthening my C++ skills and exploring Data Structures and Algorithms.</p>

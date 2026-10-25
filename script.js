@@ -1,7 +1,7 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const navLinks = document.querySelector(".nav-links");
 const header = document.querySelector(".site-header");
-const navSections = document.querySelectorAll("main section[id]:not(#journey)");
+const navSections = document.querySelectorAll("main section[id]");
 const navSectionLinks = document.querySelectorAll(".nav-link");
 const filterButtons = document.querySelectorAll(".filter-button");
 const skillCards = document.querySelectorAll(".skill-card");
@@ -13,8 +13,58 @@ const achievementGrid = document.querySelector("#achievement-grid");
 const backToTop = document.querySelector("#back-to-top");
 const modalFocusableSelector = "button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled])";
 let lastFocusedElement = null;
+let sectionTransitioning = false;
+let activeSectionId = "home";
+const introScreen = document.querySelector("#intro-screen");
+const introSkip = document.querySelector("#intro-skip");
+const introReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 document.body.classList.add("js-ready");
+
+const finishIntro = () => {
+  if (!introScreen || document.body.classList.contains("intro-complete")) return;
+  document.body.classList.remove("intro-active");
+  document.body.classList.add("intro-complete");
+  introScreen.setAttribute("aria-hidden", "true");
+  window.setTimeout(() => introScreen.remove(), introReducedMotion ? 0 : 700);
+  try {
+    sessionStorage.setItem("portfolio-intro-seen", "true");
+  } catch {
+    // Intro persistence is optional when browser storage is unavailable.
+  }
+};
+
+const startIntro = () => {
+  if (!introScreen) return;
+  let hasSeenIntro = false;
+  try {
+    hasSeenIntro = sessionStorage.getItem("portfolio-intro-seen") === "true";
+  } catch {
+    hasSeenIntro = false;
+  }
+  if (introReducedMotion || window.location.hash || hasSeenIntro) {
+    finishIntro();
+    return;
+  }
+  document.body.classList.add("intro-active");
+  introScreen.setAttribute("aria-hidden", "false");
+  window.setTimeout(finishIntro, 2700);
+};
+
+if (introScreen && !introReducedMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  introScreen.addEventListener("pointermove", (event) => {
+    const x = (event.clientX / window.innerWidth - 0.5) * 2;
+    const y = (event.clientY / window.innerHeight - 0.5) * 2;
+    introScreen.style.setProperty("--intro-mouse-x", x.toFixed(3));
+    introScreen.style.setProperty("--intro-mouse-y", y.toFixed(3));
+  });
+}
+
+introSkip?.addEventListener("click", finishIntro);
+document.addEventListener("keydown", (event) => {
+  if (document.body.classList.contains("intro-active") && event.key === "Escape") finishIntro();
+});
+startIntro();
 
 // Add verified achievements here when they become available.
 const achievements = [];
@@ -105,6 +155,29 @@ const createProjectLinks = (project, compact = false) => {
   return compact && links.length === 0 ? "" : links.join("");
 };
 
+const addTiltInteraction = (element, { maxTilt = 5, lift = 8 } = {}) => {
+  if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  const reset = () => {
+    element.style.transform = "";
+    element.style.removeProperty("--tilt-x");
+    element.style.removeProperty("--tilt-y");
+  };
+  element.addEventListener("pointermove", (event) => {
+    const bounds = element.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    element.style.setProperty("--tilt-x", `${x * 2}`);
+    element.style.setProperty("--tilt-y", `${y * 2}`);
+    element.style.transform = `perspective(900px) rotateX(${y * -maxTilt}deg) rotateY(${x * maxTilt}deg) translateZ(${lift}px)`;
+  });
+  element.addEventListener("pointerleave", reset);
+};
+
+const setupDepthInteractions = () => {
+  addTiltInteraction(document.querySelector(".profile-frame"), { maxTilt: 7, lift: 4 });
+  document.querySelectorAll(".showcase-card").forEach((card) => addTiltInteraction(card, { maxTilt: 3.5, lift: 5 }));
+};
+
 const renderProjects = (filter = "all") => {
   if (!projectShowcase) return;
   const visibleProjects = projects.filter((project) => filter === "all" || project.categories.includes(filter));
@@ -124,6 +197,7 @@ const renderProjects = (filter = "all") => {
   projectShowcase.querySelectorAll("[data-project-details]").forEach((button) => {
     button.addEventListener("click", () => openProjectModal(button.dataset.projectDetails, button));
   });
+  setupDepthInteractions();
 };
 
 const openProjectModal = (projectId, trigger) => {
@@ -210,6 +284,42 @@ navLinks?.querySelectorAll("a").forEach((link) => {
   });
 });
 
+const sectionIds = [...navSections].map((section) => section.id);
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+const setActiveSection = (id, { updateHistory = true, focus = false } = {}) => {
+  if (!sectionIds.includes(id) || sectionTransitioning || id === activeSectionId) return;
+  const nextSection = document.querySelector(`#${id}`);
+  const currentSection = document.querySelector(`#${activeSectionId}`);
+  if (!nextSection) return;
+  sectionTransitioning = true;
+  nextSection.classList.add("section-active", "section-entering");
+  currentSection?.classList.add("section-leaving");
+  navSectionLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
+  document.body.dataset.activeSection = id;
+  if (updateHistory) history.pushState({ section: id }, "", `#${id}`);
+  nextSection.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
+  if (focus) nextSection.setAttribute("tabindex", "-1");
+  window.setTimeout(() => {
+    currentSection?.classList.remove("section-active", "section-leaving");
+    nextSection.classList.remove("section-entering");
+    if (focus) nextSection.focus({ preventScroll: true });
+    activeSectionId = id;
+    sectionTransitioning = false;
+  }, reducedMotionQuery.matches ? 0 : 560);
+};
+
+const showInitialSection = () => {
+  const requestedId = sectionIds.includes(window.location.hash.slice(1)) ? window.location.hash.slice(1) : "home";
+  navSections.forEach((section) => section.classList.toggle("section-active", section.id === requestedId));
+  navSectionLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${requestedId}`));
+  document.body.dataset.activeSection = requestedId;
+  activeSectionId = requestedId;
+  document.querySelector(`#${requestedId}`)?.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
+};
+
+showInitialSection();
+
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -223,6 +333,7 @@ document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe
 
 const observedNavSections = [...navSections];
 const navObserver = new IntersectionObserver((entries) => {
+  if (document.body.classList.contains("fullscreen-sections")) return;
   const visibleSection = entries
     .filter((entry) => entry.isIntersecting)
     .sort((first, second) => second.intersectionRatio - first.intersectionRatio)[0];
@@ -233,14 +344,31 @@ const navObserver = new IntersectionObserver((entries) => {
 }, { rootMargin: "-96px 0px -55% 0px", threshold: [0.1, 0.35, 0.6] });
 
 observedNavSections.forEach((section) => navObserver.observe(section));
+document.body.classList.add("fullscreen-sections");
 
 document.querySelectorAll('a[href^="#"]').forEach((link) => {
   link.addEventListener("click", (event) => {
-    const target = document.querySelector(link.getAttribute("href"));
-    if (!target) return;
+    const targetId = link.getAttribute("href")?.slice(1);
+    if (!targetId || !sectionIds.includes(targetId)) return;
     event.preventDefault();
-    target.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    setActiveSection(targetId, { focus: false });
   });
+});
+
+window.addEventListener("popstate", () => {
+  const requestedId = sectionIds.includes(window.location.hash.slice(1)) ? window.location.hash.slice(1) : "home";
+  if (requestedId !== activeSectionId) setActiveSection(requestedId, { updateHistory: false, focus: true });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (sectionTransitioning || projectModal?.hidden === false || navLinks?.classList.contains("open")) return;
+  if (!["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(event.key)) return;
+  const currentIndex = sectionIds.indexOf(activeSectionId);
+  const direction = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1;
+  const nextIndex = Math.min(Math.max(currentIndex + direction, 0), sectionIds.length - 1);
+  if (nextIndex === currentIndex) return;
+  event.preventDefault();
+  setActiveSection(sectionIds[nextIndex]);
 });
 
 const updateNavigation = () => {
