@@ -18,7 +18,7 @@ No framework, build step, or backend service is required.
 - Featured Projects
 - Project filters and accessible project details modal
 - Achievements and Learning Journey
-- Contact information and front-end-only contact form
+- Contact information and Formspree-powered contact form
 - Social links and responsive footer
 
 ## Run Locally
@@ -54,6 +54,6 @@ The published URL depends on the GitHub account name and repository name. Do not
 
 **Pending repository selection.** The repository URL will be added once the portfolio repository is known.
 
-## Contact Form Note
+## Contact Form
 
-The contact form performs front-end validation only. It does not deliver email by itself. Visitors can use the optional **Open Email App** action after validation to create a mailto draft in their own email application.
+The contact form validates the fields in the browser and submits messages to the configured Formspree endpoint. Formspree must remain active and configured to deliver messages to the intended email address. If a submission fails, visitors can use the optional **Open Email App** action to create a mailto draft in their own email application.

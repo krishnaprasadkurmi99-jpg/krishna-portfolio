@@ -309,7 +309,7 @@ filterButtons.forEach((button) => {
     });
   });
 
-  contactForm?.addEventListener("submit", (event) => {
+  contactForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const isValid = contactFields.map(validateContactField).every(Boolean);
     if (!isValid) {
@@ -319,11 +319,39 @@ filterButtons.forEach((button) => {
       }
       return;
     }
+    const submitButton = contactForm.querySelector(".form-submit");
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.setAttribute("aria-busy", "true");
+    }
     if (formStatus) {
-      formStatus.textContent = "Form validated successfully! Message delivery is not connected yet. Please contact me directly by email.";
+      formStatus.textContent = "Sending your message...";
       formStatus.classList.remove("is-error");
     }
-    if (emailAppButton) emailAppButton.hidden = false;
+    if (emailAppButton) emailAppButton.hidden = true;
+
+    try {
+      const response = await fetch(contactForm.action, {
+        method: "POST",
+        body: new FormData(contactForm),
+        headers: { Accept: "application/json" }
+      });
+      if (!response.ok) throw new Error(`Form submission failed with status ${response.status}.`);
+      contactForm.reset();
+      if (formStatus) formStatus.textContent = "Thanks for reaching out! Your message was sent successfully.";
+    } catch (error) {
+      console.error("Contact form submission failed:", error);
+      if (formStatus) {
+        formStatus.textContent = "Your message could not be sent right now. Please try again or email me directly.";
+        formStatus.classList.add("is-error");
+      }
+      if (emailAppButton) emailAppButton.hidden = false;
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.removeAttribute("aria-busy");
+      }
+    }
   });
 
   emailAppButton?.addEventListener("click", () => {
