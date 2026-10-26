@@ -320,6 +320,12 @@ const showInitialSection = () => {
 
 showInitialSection();
 
+const updateMobileSectionState = (id) => {
+  activeSectionId = id;
+  document.body.dataset.activeSection = id;
+  navSectionLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
+};
+
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -354,10 +360,14 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
     if (window.matchMedia("(max-width: 800px)").matches) {
       const target = document.querySelector(`#${targetId}`);
       if (!target) return;
-      activeSectionId = targetId;
-      navSectionLinks.forEach((navLink) => navLink.classList.toggle("active", navLink.getAttribute("href") === `#${targetId}`));
+      updateMobileSectionState(targetId);
       history.pushState({ section: targetId }, "", `#${targetId}`);
-      target.scrollIntoView({ behavior: reducedMotionQuery.matches ? "auto" : "smooth", block: "start" });
+      const headerOffset = header?.getBoundingClientRect().height ?? 0;
+      const targetTop = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: "auto"
+      });
       return;
     }
     setActiveSection(targetId, { focus: false });

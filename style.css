@@ -186,6 +186,7 @@ a { color: inherit; }
 .container { width: min(1180px, calc(100% - 64px)); }
 :focus-visible { outline-color: var(--purple); }
 .site-header { position: sticky; top: 0; padding: 18px 0; background: rgba(255, 255, 255, .94); border-bottom: 1px solid transparent; backdrop-filter: blur(12px); }
+.site-header.is-scrolled { background: rgba(255, 255, 255, .96); border-bottom-color: var(--line); }
 .site-header.scrolled { border-bottom-color: var(--line); }
 .brand-mark { width: 38px; height: 38px; border-radius: 9px; color: #fff; background: var(--purple); box-shadow: none; }
 .brand-name { color: var(--ink); font-size: 21px; }
@@ -302,8 +303,10 @@ h1 { font-size: clamp(50px, 7vw, 88px); font-weight: 600; }
 .back-to-top:hover { border-color: var(--purple); box-shadow: 0 8px 22px rgba(185, 28, 28, .16); }
 
 @media (max-width: 800px) {
+  html { scroll-behavior: auto; }
   .container { width: min(100% - 40px, 620px); }
   .site-header { padding: 14px 0; }
+  .site-header.is-scrolled { background: rgba(255, 255, 255, .97); border-bottom-color: var(--line); }
   .nav-links { background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
   .hero { min-height: auto; padding-top: 72px; padding-bottom: 80px; gap: 35px; }
   .hero-copy { text-align: left; }
