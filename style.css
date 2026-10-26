@@ -579,6 +579,7 @@ body.permanent-orbit .contact-section > .container { display: block; }
     top: 50%;
     width: min(96vw, 84svh, 720px);
     height: auto;
+    aspect-ratio: 1;
     transform: translate(-50%, -50%);
   }
 
