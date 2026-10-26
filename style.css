@@ -583,6 +583,11 @@ body.permanent-orbit .contact-section > .container { display: block; }
     transform: translate(-50%, -50%);
   }
 
+  body.permanent-orbit .orbit-node { width: 108px; }
+  body.permanent-orbit .orbit-node button { min-height: 66px; padding: 9px 10px; grid-template-columns: 25px 1fr; column-gap: 7px; }
+  body.permanent-orbit .orbit-node-icon { width: 24px; height: 24px; font-size: 11px; }
+  body.permanent-orbit .orbit-node strong { font-size: 11px; }
+  body.permanent-orbit .orbit-node small { font-size: 6px; }
   body.permanent-orbit .orbit-core-chip { width: 58px; height: 58px; border-width: 2px; box-shadow: 5px 7px 0 rgba(23,23,23,.04); }
   body.permanent-orbit .orbit-hint { bottom: 22px; }
   body.permanent-orbit .orbit-name { font-size: clamp(20px, 6vw, 30px); }

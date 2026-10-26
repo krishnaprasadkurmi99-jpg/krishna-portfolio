@@ -368,7 +368,10 @@ const renderOrbitalNodes = (timestamp) => {
   const elapsed = timestamp - orbitAnimationStartedAt;
   const system = document.querySelector(".orbit-system");
   const systemWidth = system?.getBoundingClientRect().width || 680;
-  const orbitScale = Math.min(1, Math.max(.45, (systemWidth / 2 - 72) / 218));
+  const isMobileOrbit = window.matchMedia("(max-width: 800px)").matches;
+  const orbitScale = isMobileOrbit
+    ? Math.min(1, Math.max(.62, (systemWidth / 2 - 58) / 218))
+    : Math.min(1, Math.max(.45, (systemWidth / 2 - 72) / 218));
   orbitalNodes.forEach((node, index) => {
     const motion = orbitalMotion[index];
     const phase = Number(node.dataset.orbitPhase || 0);
