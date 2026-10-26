@@ -351,6 +351,15 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
     const targetId = link.getAttribute("href")?.slice(1);
     if (!targetId || !sectionIds.includes(targetId)) return;
     event.preventDefault();
+    if (window.matchMedia("(max-width: 800px)").matches) {
+      const target = document.querySelector(`#${targetId}`);
+      if (!target) return;
+      activeSectionId = targetId;
+      navSectionLinks.forEach((navLink) => navLink.classList.toggle("active", navLink.getAttribute("href") === `#${targetId}`));
+      history.pushState({ section: targetId }, "", `#${targetId}`);
+      target.scrollIntoView({ behavior: reducedMotionQuery.matches ? "auto" : "smooth", block: "start" });
+      return;
+    }
     setActiveSection(targetId, { focus: false });
   });
 });

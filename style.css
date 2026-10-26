@@ -204,6 +204,8 @@ h1, h2, h3 { color: var(--ink); letter-spacing: -.055em; }
 h1 { font-size: clamp(50px, 7vw, 88px); font-weight: 600; }
 .gradient-text { background: none; color: var(--purple); }
 .hero-title { max-width: 700px; font-size: clamp(32px, 4.2vw, 57px); }
+.hero-copy h1 .gradient-text { background: none; color: var(--purple); animation: none; }
+.hero-title { color: #242424; }
 .hero-intro { color: #555; max-width: 530px; font-size: 17px; }
 .hero-support { color: #777; }
 .hero-actions { margin-top: 32px; }
@@ -306,6 +308,8 @@ h1 { font-size: clamp(50px, 7vw, 88px); font-weight: 600; }
   .hero { min-height: auto; padding-top: 72px; padding-bottom: 80px; gap: 35px; }
   .hero-copy { text-align: left; }
   .hero-title { font-size: clamp(30px, 8vw, 44px); }
+  .hero-title { color: #242424; }
+  .hero-copy h1 .gradient-text { color: var(--purple); }
   .hero-actions { flex-wrap: wrap; }
   .profile-visual { min-height: 400px; }
   .profile-card--degree { left: 1%; }
