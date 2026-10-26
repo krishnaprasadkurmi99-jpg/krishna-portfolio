@@ -86,20 +86,50 @@
         <span class="brand-mark">KPK</span>
         <span class="brand-name">Krishna<span>.</span></span>
       </a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-menu" aria-label="Open navigation menu">
-        <span></span><span></span>
-      </button>
-      <div class="nav-links" id="primary-menu">
-        <a class="nav-link active" href="#home">Home</a>
-        <a class="nav-link" href="#about">About</a>
-        <a class="nav-link" href="#skills">Skills</a>
-        <a class="nav-link" href="#projects">Projects</a>
-        <a class="nav-link" href="#journey">Education</a>
-        <a class="nav-link" href="#contact">Contact</a>
-        <a href="#contact" class="nav-cta">Let's Talk <span>↗</span></a>
-      </div>
     </nav>
   </header>
+
+  <div class="orbit-selector" id="orbit-selector" aria-hidden="false">
+    <div class="orbit-backdrop"></div>
+    <section class="orbit-stage" aria-labelledby="orbit-title">
+      <div class="orbit-toolbar">
+        <p class="orbit-kicker" id="orbit-title">PORTFOLIO NAVIGATION</p>
+        <p class="orbit-live-status">ORBITAL INTERFACE <span>●</span></p>
+      </div>
+      <div class="orbit-system">
+        <div class="orbit-ring orbit-ring--outer" aria-hidden="true"></div>
+        <div class="orbit-ring orbit-ring--inner" aria-hidden="true"></div>
+        <div class="orbit-circuit" aria-hidden="true"><span></span><i></i><b></b></div>
+        <div class="orbit-core" aria-hidden="true">
+          <span class="orbit-core-chip">KPK</span>
+          <small>SELECT A<br>DESTINATION</small>
+        </div>
+        <div class="orbit-node orbit-node--home" data-orbit-phase="0">
+          <button type="button" data-orbit-target="home" data-section-link aria-label="Open Home section"><span class="orbit-node-icon">⌂</span><strong>Home</strong><small>INTRODUCTION</small></button>
+        </div>
+        <div class="orbit-node orbit-node--about" data-orbit-phase="1.047">
+          <button type="button" data-orbit-target="about" data-section-link aria-label="Open About section"><span class="orbit-node-icon">◎</span><strong>About</strong><small>MY STORY</small></button>
+        </div>
+        <div class="orbit-node orbit-node--skills" data-orbit-phase="2.094">
+          <button type="button" data-orbit-target="skills" data-section-link aria-label="Open Skills section"><span class="orbit-node-icon">&lt;/&gt;</span><strong>Skills</strong><small>TOOLKIT</small></button>
+        </div>
+        <div class="orbit-node orbit-node--projects" data-orbit-phase="3.142">
+          <button type="button" data-orbit-target="projects" data-section-link aria-label="Open Projects section"><span class="orbit-node-icon">✦</span><strong>Projects</strong><small>SELECTED WORK</small></button>
+        </div>
+        <div class="orbit-node orbit-node--journey" data-orbit-phase="4.189">
+          <button type="button" data-orbit-target="journey" data-section-link aria-label="Open Education section"><span class="orbit-node-icon">01</span><strong>Education</strong><small>MY JOURNEY</small></button>
+        </div>
+        <div class="orbit-node orbit-node--contact" data-orbit-phase="5.236">
+          <button type="button" data-orbit-target="contact" data-section-link aria-label="Open Contact section"><span class="orbit-node-icon">@</span><strong>Contact</strong><small>LET'S TALK</small></button>
+        </div>
+      </div>
+      <p class="orbit-hint">Choose a destination <span>•</span> Use Tab to explore</p>
+    </section>
+  </div>
+
+  <button class="section-orbit-return" id="section-orbit-return" type="button" aria-label="Return to orbital navigation">
+    <span aria-hidden="true">↶</span> Orbit
+  </button>
 
   <main>
     <section class="hero container" id="home" aria-labelledby="home-title">

@@ -2,7 +2,7 @@ const menuToggle = document.querySelector(".menu-toggle");
 const navLinks = document.querySelector(".nav-links");
 const header = document.querySelector(".site-header");
 const navSections = document.querySelectorAll("main section[id]");
-const navSectionLinks = document.querySelectorAll(".nav-link");
+const navSectionLinks = document.querySelectorAll("[data-section-link]");
 const filterButtons = document.querySelectorAll(".filter-button");
 const skillCards = document.querySelectorAll(".skill-card");
 const projectShowcase = document.querySelector("#project-showcase");
@@ -15,56 +15,17 @@ const modalFocusableSelector = "button:not([disabled]), a[href], input:not([disa
 let lastFocusedElement = null;
 let sectionTransitioning = false;
 let activeSectionId = "home";
-const introScreen = document.querySelector("#intro-screen");
-const introSkip = document.querySelector("#intro-skip");
 const introReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const orbitSelector = document.querySelector("#orbit-selector");
+const orbitTargets = document.querySelectorAll("[data-orbit-target]");
+const sectionOrbitReturn = document.querySelector("#section-orbit-return");
+let orbitAnimationFrame = 0;
+let orbitAnimationStartedAt = 0;
+let orbitSelecting = false;
 
 document.body.classList.add("js-ready");
 
-const finishIntro = () => {
-  if (!introScreen || document.body.classList.contains("intro-complete")) return;
-  document.body.classList.remove("intro-active");
-  document.body.classList.add("intro-complete");
-  introScreen.setAttribute("aria-hidden", "true");
-  window.setTimeout(() => introScreen.remove(), introReducedMotion ? 0 : 700);
-  try {
-    sessionStorage.setItem("portfolio-intro-seen", "true");
-  } catch {
-    // Intro persistence is optional when browser storage is unavailable.
-  }
-};
-
-const startIntro = () => {
-  if (!introScreen) return;
-  let hasSeenIntro = false;
-  try {
-    hasSeenIntro = sessionStorage.getItem("portfolio-intro-seen") === "true";
-  } catch {
-    hasSeenIntro = false;
-  }
-  if (introReducedMotion || window.location.hash || hasSeenIntro) {
-    finishIntro();
-    return;
-  }
-  document.body.classList.add("intro-active");
-  introScreen.setAttribute("aria-hidden", "false");
-  window.setTimeout(finishIntro, 2700);
-};
-
-if (introScreen && !introReducedMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-  introScreen.addEventListener("pointermove", (event) => {
-    const x = (event.clientX / window.innerWidth - 0.5) * 2;
-    const y = (event.clientY / window.innerHeight - 0.5) * 2;
-    introScreen.style.setProperty("--intro-mouse-x", x.toFixed(3));
-    introScreen.style.setProperty("--intro-mouse-y", y.toFixed(3));
-  });
-}
-
-introSkip?.addEventListener("click", finishIntro);
-document.addEventListener("keydown", (event) => {
-  if (document.body.classList.contains("intro-active") && event.key === "Escape") finishIntro();
-});
-startIntro();
+// The orbital interface is the permanent navigation shell.
 
 // Add verified achievements here when they become available.
 const achievements = [];
@@ -287,6 +248,20 @@ navLinks?.querySelectorAll("a").forEach((link) => {
 const sectionIds = [...navSections].map((section) => section.id);
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+const isSectionLinkFor = (link, id) => (
+  link.getAttribute("href") === `#${id}` || link.dataset.orbitTarget === id
+);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && document.body.classList.contains("orbit-open")) {
+    if (document.body.classList.contains("section-view")) {
+      showOrbitView();
+      return;
+    }
+    orbitSelector?.querySelector(`[data-orbit-target="${activeSectionId}"]`)?.focus();
+  }
+});
+
 const setActiveSection = (id, { updateHistory = true, focus = false } = {}) => {
   if (!sectionIds.includes(id) || sectionTransitioning || id === activeSectionId) return;
   const nextSection = document.querySelector(`#${id}`);
@@ -295,7 +270,7 @@ const setActiveSection = (id, { updateHistory = true, focus = false } = {}) => {
   sectionTransitioning = true;
   nextSection.classList.add("section-active", "section-entering");
   currentSection?.classList.add("section-leaving");
-  navSectionLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
+  navSectionLinks.forEach((link) => link.classList.toggle("active", isSectionLinkFor(link, id)));
   document.body.dataset.activeSection = id;
   if (updateHistory) history.pushState({ section: id }, "", `#${id}`);
   nextSection.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
@@ -310,10 +285,12 @@ const setActiveSection = (id, { updateHistory = true, focus = false } = {}) => {
 };
 
 const showInitialSection = () => {
-  const requestedId = sectionIds.includes(window.location.hash.slice(1)) ? window.location.hash.slice(1) : "home";
+  const requestedHash = window.location.hash.slice(1);
+  const requestedId = sectionIds.includes(requestedHash) ? requestedHash : "home";
   navSections.forEach((section) => section.classList.toggle("section-active", section.id === requestedId));
-  navSectionLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${requestedId}`));
+  navSectionLinks.forEach((link) => link.classList.toggle("active", isSectionLinkFor(link, requestedId)));
   document.body.dataset.activeSection = requestedId;
+  document.body.classList.toggle("section-view", Boolean(requestedHash));
   activeSectionId = requestedId;
   document.querySelector(`#${requestedId}`)?.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
 };
@@ -323,8 +300,117 @@ showInitialSection();
 const updateMobileSectionState = (id) => {
   activeSectionId = id;
   document.body.dataset.activeSection = id;
-  navSectionLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
+  navSectionLinks.forEach((link) => link.classList.toggle("active", isSectionLinkFor(link, id)));
 };
+
+const activateMobileSection = (id) => {
+  const target = document.querySelector(`#${id}`);
+  if (!target) return;
+  updateMobileSectionState(id);
+  navSections.forEach((section) => section.classList.toggle("section-active", section.id === id));
+  target.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
+};
+
+const showSectionView = () => {
+  document.body.classList.add("section-view");
+  orbitSelector?.setAttribute("aria-hidden", "true");
+  sectionOrbitReturn?.focus({ preventScroll: true });
+};
+
+const showOrbitView = ({ updateHistory = true } = {}) => {
+  document.body.classList.remove("section-view");
+  orbitSelector?.setAttribute("aria-hidden", "false");
+  if (updateHistory) history.pushState({ view: "orbit", section: activeSectionId }, "", "#");
+  window.setTimeout(() => orbitSelector?.querySelector(`[data-orbit-target="${activeSectionId}"]`)?.focus(), reducedMotionQuery.matches ? 0 : 120);
+};
+
+const navigateToSection = (targetId) => {
+  if (!sectionIds.includes(targetId)) return;
+  if (orbitSelecting) return;
+  if (window.matchMedia("(max-width: 800px)").matches) {
+    if (!document.querySelector(`#${targetId}`)) return;
+    activateMobileSection(targetId);
+    history.pushState({ section: targetId }, "", `#${targetId}`);
+    showSectionView();
+    return;
+  }
+  setActiveSection(targetId, { focus: false });
+  showSectionView();
+};
+
+orbitTargets.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (orbitSelecting) return;
+    orbitSelecting = true;
+    orbitSelector?.classList.add("is-selecting");
+    orbitTargets.forEach((target) => target.classList.toggle("active", target === button));
+    window.setTimeout(() => {
+      orbitSelector?.classList.remove("is-selecting");
+      orbitSelecting = false;
+      navigateToSection(button.dataset.orbitTarget);
+    }, reducedMotionQuery.matches ? 0 : 420);
+  });
+});
+
+const orbitalNodes = [...document.querySelectorAll(".orbit-node")];
+const orbitSystem = document.querySelector(".orbit-system");
+const orbitalMotion = [
+  { radiusX: 218, radiusY: 108, speed: 0.00016, depth: 12 },
+  { radiusX: 218, radiusY: 108, speed: 0.00016, depth: 12 },
+  { radiusX: 218, radiusY: 108, speed: 0.00016, depth: 12 },
+  { radiusX: 175, radiusY: 76, speed: -0.00022, depth: 28 },
+  { radiusX: 175, radiusY: 76, speed: -0.00022, depth: 28 },
+  { radiusX: 175, radiusY: 76, speed: -0.00022, depth: 28 }
+];
+
+const renderOrbitalNodes = (timestamp) => {
+  if (!orbitAnimationStartedAt) orbitAnimationStartedAt = timestamp;
+  const elapsed = timestamp - orbitAnimationStartedAt;
+  const system = document.querySelector(".orbit-system");
+  const systemWidth = system?.getBoundingClientRect().width || 680;
+  const orbitScale = Math.min(1, Math.max(.45, (systemWidth / 2 - 72) / 218));
+  orbitalNodes.forEach((node, index) => {
+    const motion = orbitalMotion[index];
+    const phase = Number(node.dataset.orbitPhase || 0);
+    const angle = phase + elapsed * motion.speed;
+    const x = Math.cos(angle) * motion.radiusX * orbitScale;
+    const y = Math.sin(angle) * motion.radiusY * orbitScale;
+    const depth = Math.sin(angle) * motion.depth;
+    const scale = 1 + (Math.sin(angle) * 0.04);
+    node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${depth}px) scale(${scale})`;
+    node.style.zIndex = String(Math.round(10 + depth));
+  });
+  if (document.body.classList.contains("orbit-open") && !document.hidden && !introReducedMotion) {
+    orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
+  } else {
+    orbitAnimationFrame = 0;
+  }
+};
+
+const startOrbitalMotion = () => {
+  if (orbitAnimationFrame || introReducedMotion || !orbitalNodes.length) return;
+  orbitAnimationStartedAt = performance.now();
+  orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
+};
+
+const stopOrbitalMotion = () => {
+  if (!orbitAnimationFrame) return;
+  window.cancelAnimationFrame(orbitAnimationFrame);
+  orbitAnimationFrame = 0;
+};
+
+orbitalNodes.forEach((node) => {
+  node.addEventListener("pointerenter", stopOrbitalMotion);
+  node.addEventListener("pointerleave", () => {
+    if (document.body.classList.contains("orbit-open")) startOrbitalMotion();
+  });
+});
+
+orbitSelector?.addEventListener("transitionend", startOrbitalMotion);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopOrbitalMotion();
+  else if (document.body.classList.contains("orbit-open")) startOrbitalMotion();
+});
 
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach((entry) => {
@@ -345,39 +431,42 @@ const navObserver = new IntersectionObserver((entries) => {
     .sort((first, second) => second.intersectionRatio - first.intersectionRatio)[0];
   if (!visibleSection) return;
   navSectionLinks.forEach((link) => {
-    link.classList.toggle("active", link.getAttribute("href") === `#${visibleSection.target.id}`);
+    link.classList.toggle("active", isSectionLinkFor(link, visibleSection.target.id));
   });
 }, { rootMargin: "-96px 0px -55% 0px", threshold: [0.1, 0.35, 0.6] });
 
 observedNavSections.forEach((section) => navObserver.observe(section));
 document.body.classList.add("fullscreen-sections");
+document.body.classList.add("orbit-open", "permanent-orbit");
+orbitSelector?.setAttribute("aria-hidden", "false");
+startOrbitalMotion();
 
 document.querySelectorAll('a[href^="#"]').forEach((link) => {
   link.addEventListener("click", (event) => {
     const targetId = link.getAttribute("href")?.slice(1);
     if (!targetId || !sectionIds.includes(targetId)) return;
     event.preventDefault();
-    if (window.matchMedia("(max-width: 800px)").matches) {
-      const target = document.querySelector(`#${targetId}`);
-      if (!target) return;
-      updateMobileSectionState(targetId);
-      history.pushState({ section: targetId }, "", `#${targetId}`);
-      const headerOffset = header?.getBoundingClientRect().height ?? 0;
-      const targetTop = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-      window.scrollTo({
-        top: Math.max(0, targetTop),
-        behavior: "auto"
-      });
-      return;
-    }
-    setActiveSection(targetId, { focus: false });
+    navigateToSection(targetId);
   });
 });
 
 window.addEventListener("popstate", () => {
-  const requestedId = sectionIds.includes(window.location.hash.slice(1)) ? window.location.hash.slice(1) : "home";
-  if (requestedId !== activeSectionId) setActiveSection(requestedId, { updateHistory: false, focus: true });
+  const requestedHash = window.location.hash.slice(1);
+  if (!requestedHash) {
+    showOrbitView({ updateHistory: false });
+    return;
+  }
+  const requestedId = sectionIds.includes(requestedHash) ? requestedHash : "home";
+  showSectionView();
+  if (requestedId === activeSectionId) return;
+  if (window.matchMedia("(max-width: 800px)").matches) {
+    activateMobileSection(requestedId);
+    return;
+  }
+  setActiveSection(requestedId, { updateHistory: false, focus: true });
 });
+
+sectionOrbitReturn?.addEventListener("click", () => showOrbitView());
 
 document.addEventListener("keydown", (event) => {
   if (sectionTransitioning || projectModal?.hidden === false || navLinks?.classList.contains("open")) return;
