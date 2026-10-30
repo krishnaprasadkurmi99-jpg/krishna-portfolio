@@ -111,10 +111,10 @@ const renderFeaturedProjects = () => {
       <div class="home-project-preview">${createProjectVisual(project.visual)}</div>
       <div class="home-project-info">
         <p class="project-type">${project.categoryLabel}</p>
-        <h3><a href="projects.html#${project.id}">${project.title}</a></h3>
+        <h3><a href="/projects#${project.id}">${project.title}</a></h3>
         <p>${project.description}</p>
         <div class="tags">${project.technologies.slice(0, 3).map((technology) => `<span>${technology}</span>`).join("")}</div>
-        <a class="text-link" href="projects.html#${project.id}">Project details <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href="/projects#${project.id}">Project details <span aria-hidden="true">↗</span></a>
       </div>
     </article>
   `).join("");
