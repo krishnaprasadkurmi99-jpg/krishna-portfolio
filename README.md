@@ -10,16 +10,16 @@ A responsive personal portfolio website for Krishna Prasad Kurmi, a Computer Sci
 
 No framework, build step, or backend service is required.
 
-## Website Sections
+## Website Pages
 
-- Hero and profile introduction
-- About Me
-- Skills and Technologies
-- Featured Projects
-- Project filters and accessible project details modal
-- Achievements and Learning Journey
-- Contact information and Formspree-powered contact form
-- Social links and responsive footer
+- `index.html` — Home, profile introduction, selected projects, and social links
+- `about.html` — Background, interests, and development approach
+- `skills.html` — Programming, web, database, and developer-tool skills
+- `projects.html` — Project portfolio, category filters, and accessible project details
+- `education.html` — College, degree, academic timeline, and learning milestones
+- `contact.html` — Contact details, résumé request, and Formspree-powered contact form
+
+Every page uses the shared responsive Bento Grid styling and a consistent navigation bar with regular HTML page links.
 
 ## Run Locally
 
@@ -28,12 +28,12 @@ No framework, build step, or backend service is required.
 3. Right-click `index.html`.
 4. Select **Open with Live Server**.
 
-The site can also be opened directly in a browser, but Live Server provides the most convenient local development workflow.
+The site can also be opened directly in a browser. All pages, styles, scripts, and images use relative paths for GitHub Pages compatibility.
 
 ## GitHub Pages Deployment
 
 1. Create a new GitHub repository, or select an existing repository for this portfolio.
-2. Place `index.html`, `style.css`, `script.js`, `profile-photo.png`, and this `README.md` in the repository root.
+2. Place all six HTML pages, `style.css`, `script.js`, `profile-photo.png`, `sitemap.xml`, and this `README.md` in the repository root.
 3. Confirm that `index.html` is directly at the root level, not inside another folder.
 4. Commit and push the files to the `main` branch using Git or upload them through GitHub.
 5. Open the repository's **Settings**.

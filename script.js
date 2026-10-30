@@ -1,11 +1,10 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const navLinks = document.querySelector(".nav-links");
 const header = document.querySelector(".site-header");
-const navSections = document.querySelectorAll("main section[id]");
-const navSectionLinks = document.querySelectorAll("[data-section-link]");
 const filterButtons = document.querySelectorAll(".filter-button");
 const skillCards = document.querySelectorAll(".skill-card");
 const projectShowcase = document.querySelector("#project-showcase");
+const homeFeaturedProjects = document.querySelector("#home-featured-projects");
 const projectFilters = document.querySelectorAll(".project-filter");
 const projectModal = document.querySelector("#project-modal");
 const modalCloseButtons = document.querySelectorAll("[data-modal-close]");
@@ -13,19 +12,6 @@ const achievementGrid = document.querySelector("#achievement-grid");
 const backToTop = document.querySelector("#back-to-top");
 const modalFocusableSelector = "button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled])";
 let lastFocusedElement = null;
-let sectionTransitioning = false;
-let activeSectionId = "home";
-const introReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const orbitSelector = document.querySelector("#orbit-selector");
-const orbitTargets = document.querySelectorAll("[data-orbit-target]");
-const sectionOrbitReturn = document.querySelector("#section-orbit-return");
-let orbitAnimationFrame = 0;
-let orbitAnimationStartedAt = 0;
-let orbitSelecting = false;
-
-document.body.classList.add("js-ready");
-
-// The orbital interface is the permanent navigation shell.
 
 // Add verified achievements here when they become available.
 const achievements = [];
@@ -37,7 +23,7 @@ const renderAchievements = () => {
     return;
   }
   achievementGrid.innerHTML = achievements.map((achievement) => `
-    <article class="achievement-card reveal visible">
+    <article class="achievement-card">
       <span class="achievement-card-icon" aria-hidden="true">${achievement.icon || "✦"}</span>
       <p class="journey-kicker">${achievement.type}</p>
       <h3>${achievement.title}</h3>
@@ -116,41 +102,37 @@ const createProjectLinks = (project, compact = false) => {
   return compact && links.length === 0 ? "" : links.join("");
 };
 
-const addTiltInteraction = (element, { maxTilt = 5, lift = 8 } = {}) => {
-  if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-  const reset = () => {
-    element.style.transform = "";
-    element.style.removeProperty("--tilt-x");
-    element.style.removeProperty("--tilt-y");
-  };
-  element.addEventListener("pointermove", (event) => {
-    const bounds = element.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    element.style.setProperty("--tilt-x", `${x * 2}`);
-    element.style.setProperty("--tilt-y", `${y * 2}`);
-    element.style.transform = `perspective(900px) rotateX(${y * -maxTilt}deg) rotateY(${x * maxTilt}deg) translateZ(${lift}px)`;
-  });
-  element.addEventListener("pointerleave", reset);
-};
-
-const setupDepthInteractions = () => {
-  addTiltInteraction(document.querySelector(".profile-frame"), { maxTilt: 7, lift: 4 });
-  document.querySelectorAll(".showcase-card").forEach((card) => addTiltInteraction(card, { maxTilt: 3.5, lift: 5 }));
+const renderFeaturedProjects = () => {
+  if (!homeFeaturedProjects) return;
+  const featuredProjects = projects.filter((project) => project.featured);
+  const selectedProjects = [...featuredProjects, ...projects.filter((project) => !project.featured)].slice(0, 2);
+  homeFeaturedProjects.innerHTML = selectedProjects.map((project) => `
+    <article class="home-project-card">
+      <div class="home-project-preview">${createProjectVisual(project.visual)}</div>
+      <div class="home-project-info">
+        <p class="project-type">${project.categoryLabel}</p>
+        <h3><a href="projects.html#${project.id}">${project.title}</a></h3>
+        <p>${project.description}</p>
+        <div class="tags">${project.technologies.slice(0, 3).map((technology) => `<span>${technology}</span>`).join("")}</div>
+        <a class="text-link" href="projects.html#${project.id}">Project details <span aria-hidden="true">↗</span></a>
+      </div>
+    </article>
+  `).join("");
 };
 
 const renderProjects = (filter = "all") => {
   if (!projectShowcase) return;
   const visibleProjects = projects.filter((project) => filter === "all" || project.categories.includes(filter));
   projectShowcase.innerHTML = visibleProjects.map((project, index) => `
-    <article class="showcase-card ${project.featured ? "showcase-card--featured" : ""} reveal visible" data-project-id="${project.id}">
+    <article class="showcase-card ${project.featured ? "showcase-card--featured" : ""}" id="${project.id}" data-project-id="${project.id}">
       ${createProjectVisual(project.visual)}
       <div class="showcase-info">
         <div class="showcase-topline"><p class="project-type">${project.categoryLabel}</p><span class="status-badge status-configurable">${project.status}</span></div>
         <h3>${project.title}</h3>
         <p>${project.description}</p>
-        <div class="tags">${project.technologies.slice(0, 4).map((technology) => `<span>${technology}</span>`).join("")}</div>
-        <div class="showcase-actions"><button class="button button-primary project-details-button" type="button" data-project-details="${project.id}">View Details <span>↗</span></button>${createProjectLinks(project, true)}</div>
+        <div class="tags">${project.technologies.map((technology) => `<span>${technology}</span>`).join("")}</div>
+        <ul class="project-feature-list">${project.features.slice(0, 3).map((feature) => `<li>${feature}</li>`).join("")}</ul>
+        <div class="showcase-actions"><button class="button button-primary project-details-button" type="button" data-project-details="${project.id}">View Details <span>↗</span></button>${createProjectLinks(project, true) || '<span class="project-link-note">Repository link not listed</span>'}</div>
       </div>
     </article>
   `).join("");
@@ -158,7 +140,6 @@ const renderProjects = (filter = "all") => {
   projectShowcase.querySelectorAll("[data-project-details]").forEach((button) => {
     button.addEventListener("click", () => openProjectModal(button.dataset.projectDetails, button));
   });
-  setupDepthInteractions();
 };
 
 const openProjectModal = (projectId, trigger) => {
@@ -196,6 +177,7 @@ const closeProjectModal = () => {
   lastFocusedElement?.focus();
 };
 
+renderFeaturedProjects();
 renderProjects();
 renderAchievements();
 
@@ -231,6 +213,12 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+const closeMobileNavigation = () => {
+  navLinks?.classList.remove("open");
+  menuToggle?.setAttribute("aria-expanded", "false");
+  menuToggle?.setAttribute("aria-label", "Open navigation menu");
+};
+
 menuToggle?.addEventListener("click", () => {
   const isOpen = navLinks?.classList.toggle("open") ?? false;
   menuToggle.setAttribute("aria-expanded", String(isOpen));
@@ -238,318 +226,14 @@ menuToggle?.addEventListener("click", () => {
 });
 
 navLinks?.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    navLinks.classList.remove("open");
-    menuToggle?.setAttribute("aria-expanded", "false");
-    menuToggle?.setAttribute("aria-label", "Open navigation menu");
-  });
+  link.addEventListener("click", closeMobileNavigation);
 });
-
-const sectionIds = [...navSections].map((section) => section.id);
-const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-const isSectionLinkFor = (link, id) => (
-  link.getAttribute("href") === `#${id}` || link.dataset.orbitTarget === id
-);
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && document.body.classList.contains("orbit-open")) {
-    if (document.body.classList.contains("section-view")) {
-      showOrbitView();
-      return;
-    }
-    orbitSelector?.querySelector(`[data-orbit-target="${activeSectionId}"]`)?.focus();
+  if (event.key === "Escape" && navLinks?.classList.contains("open")) {
+    closeMobileNavigation();
+    menuToggle?.focus();
   }
-});
-
-const setActiveSection = (id, { updateHistory = true, focus = false } = {}) => {
-  if (!sectionIds.includes(id) || sectionTransitioning || id === activeSectionId) return;
-  const nextSection = document.querySelector(`#${id}`);
-  const currentSection = document.querySelector(`#${activeSectionId}`);
-  if (!nextSection) return;
-  sectionTransitioning = true;
-  nextSection.classList.add("section-active", "section-entering");
-  currentSection?.classList.add("section-leaving");
-  navSectionLinks.forEach((link) => link.classList.toggle("active", isSectionLinkFor(link, id)));
-  document.body.dataset.activeSection = id;
-  if (updateHistory) history.pushState({ section: id }, "", `#${id}`);
-  nextSection.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
-  if (focus) nextSection.setAttribute("tabindex", "-1");
-  window.setTimeout(() => {
-    currentSection?.classList.remove("section-active", "section-leaving");
-    nextSection.classList.remove("section-entering");
-    if (focus) nextSection.focus({ preventScroll: true });
-    activeSectionId = id;
-    sectionTransitioning = false;
-  }, reducedMotionQuery.matches ? 0 : 560);
-};
-
-const showInitialSection = () => {
-  const requestedHash = window.location.hash.slice(1);
-  const requestedId = sectionIds.includes(requestedHash) ? requestedHash : "home";
-  navSections.forEach((section) => section.classList.toggle("section-active", section.id === requestedId));
-  navSectionLinks.forEach((link) => link.classList.toggle("active", isSectionLinkFor(link, requestedId)));
-  document.body.dataset.activeSection = requestedId;
-  document.body.classList.toggle("section-view", Boolean(requestedHash));
-  activeSectionId = requestedId;
-  document.querySelector(`#${requestedId}`)?.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
-};
-
-showInitialSection();
-
-const updateMobileSectionState = (id) => {
-  activeSectionId = id;
-  document.body.dataset.activeSection = id;
-  navSectionLinks.forEach((link) => link.classList.toggle("active", isSectionLinkFor(link, id)));
-};
-
-const activateMobileSection = (id) => {
-  const target = document.querySelector(`#${id}`);
-  if (!target) return;
-  updateMobileSectionState(id);
-  navSections.forEach((section) => section.classList.toggle("section-active", section.id === id));
-  target.querySelectorAll(".reveal").forEach((element) => element.classList.add("visible"));
-};
-
-const showSectionView = () => {
-  document.body.classList.add("section-view");
-  orbitSelector?.setAttribute("aria-hidden", "true");
-  sectionOrbitReturn?.focus({ preventScroll: true });
-};
-
-const showOrbitView = ({ updateHistory = true } = {}) => {
-  document.body.classList.remove("section-view");
-  orbitSelector?.setAttribute("aria-hidden", "false");
-  if (updateHistory) history.pushState({ view: "orbit", section: activeSectionId }, "", "#");
-  window.setTimeout(() => orbitSelector?.querySelector(`[data-orbit-target="${activeSectionId}"]`)?.focus(), reducedMotionQuery.matches ? 0 : 120);
-};
-
-const navigateToSection = (targetId) => {
-  if (!sectionIds.includes(targetId)) return;
-  if (orbitSelecting) return;
-  if (window.matchMedia("(max-width: 800px)").matches) {
-    if (!document.querySelector(`#${targetId}`)) return;
-    activateMobileSection(targetId);
-    history.pushState({ section: targetId }, "", `#${targetId}`);
-    showSectionView();
-    return;
-  }
-  setActiveSection(targetId, { focus: false });
-  showSectionView();
-};
-
-orbitTargets.forEach((button) => {
-  button.addEventListener("click", () => {
-    if (orbitSelecting) return;
-    orbitSelecting = true;
-    orbitSelector?.classList.add("is-selecting");
-    orbitTargets.forEach((target) => target.classList.toggle("active", target === button));
-    window.setTimeout(() => {
-      orbitSelector?.classList.remove("is-selecting");
-      orbitSelecting = false;
-      navigateToSection(button.dataset.orbitTarget);
-    }, reducedMotionQuery.matches ? 0 : 420);
-  });
-});
-
-const orbitalNodes = [...document.querySelectorAll(".orbit-node")];
-const orbitSystem = document.querySelector(".orbit-system");
-
-const renderOrbitalNodes = (timestamp) => {
-  if (!orbitAnimationStartedAt) orbitAnimationStartedAt = timestamp;
-  const elapsed = timestamp - orbitAnimationStartedAt;
-  const { width, height } = orbitSystem?.getBoundingClientRect() ?? { width: 680, height: 680 };
-  const isMobileOrbit = window.matchMedia("(max-width: 800px)").matches;
-  const nodeSize = orbitalNodes.map((node) => ({ width: node.offsetWidth, height: node.offsetHeight }));
-  const nodeWidth = Math.max(...nodeSize.map((size) => size.width)) || (isMobileOrbit ? 108 : 145);
-  const nodeHeight = Math.max(...nodeSize.map((size) => size.height)) || (isMobileOrbit ? 66 : 83);
-  const padding = isMobileOrbit ? 9 : 16;
-  const systemRadius = Math.min(width, height) / 2 - padding;
-  const systemBounds = orbitSystem?.getBoundingClientRect();
-  const centerY = systemBounds ? systemBounds.top + systemBounds.height / 2 : window.innerHeight / 2;
-  const headingBottom = document.querySelector(".orbit-heading")?.getBoundingClientRect().bottom ?? 0;
-  const hintTop = document.querySelector(".orbit-hint")?.getBoundingClientRect().top ?? window.innerHeight;
-  const tilt = 54 * Math.PI / 180;
-  const planeRotation = -15 * Math.PI / 180;
-  const cosTilt = Math.cos(tilt);
-  const cosRotation = Math.cos(planeRotation);
-  const sinRotation = Math.sin(planeRotation);
-  const xExtent = 1;
-  const yExtent = cosTilt;
-  const topClearance = centerY - headingBottom - nodeHeight / 2 - 14;
-  const bottomClearance = hintTop - centerY - nodeHeight / 2 - 14;
-  const horizontalClearance = Math.min(window.innerWidth / 2, width / 2) - nodeWidth / 2 - padding;
-  const orbitRadius = Math.max(0, Math.min(
-    systemRadius * .94,
-    horizontalClearance / xExtent,
-    topClearance / yExtent,
-    bottomClearance / yExtent
-  ));
-  const angularSpeed = .00016;
-  const positions = orbitalNodes.map((_, index) => {
-    const angle = (Math.PI * 2 * index) / orbitalNodes.length + elapsed * angularSpeed;
-    const localX = Math.cos(angle) * orbitRadius;
-    const localY = Math.sin(angle) * orbitRadius;
-    const rotatedX = localX * cosRotation - localY * sinRotation;
-    const rotatedY = localX * sinRotation + localY * cosRotation;
-    return {
-      x: rotatedX,
-      y: rotatedY * cosTilt,
-      depth: rotatedY * Math.sin(tilt)
-    };
-  });
-  const perspective = 1100;
-  const projectedPositions = positions.map((position, index) => {
-    const perspectiveScale = perspective / (perspective - position.depth);
-    const depthScale = 0.9 + ((position.depth / Math.max(orbitRadius, 1)) * .1);
-    return {
-      x: position.x * perspectiveScale,
-      y: position.y * perspectiveScale,
-      width: nodeSize[index].width * perspectiveScale * depthScale,
-      height: nodeSize[index].height * perspectiveScale * depthScale
-    };
-  });
-  let nodeScale = 1;
-  const collisionGap = isMobileOrbit ? 8 : 14;
-  projectedPositions.forEach((position, index) => {
-    projectedPositions.slice(index + 1).forEach((other) => {
-      const centerDistanceX = Math.abs(position.x - other.x);
-      const centerDistanceY = Math.abs(position.y - other.y);
-      const combinedWidth = (position.width + other.width) / 2;
-      const combinedHeight = (position.height + other.height) / 2;
-      const maxSafeScale = Math.max(
-        (centerDistanceX - collisionGap) / combinedWidth,
-        (centerDistanceY - collisionGap) / combinedHeight
-      );
-      nodeScale = Math.min(nodeScale, maxSafeScale);
-    });
-  });
-  nodeScale = Math.max(.3, Math.min(1, nodeScale));
-  const positionNodes = () => {
-    orbitalNodes.forEach((node, index) => {
-      const { x, y, depth } = positions[index];
-      const depthScale = 0.9 + ((depth / Math.max(orbitRadius, 1)) * .1);
-      const scale = nodeScale * depthScale;
-      node.style.left = "50%";
-      node.style.top = "50%";
-      node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${depth}px) scale(${scale})`;
-      node.style.zIndex = String(depth < 0 ? 2 : 12);
-      node.style.opacity = String(0.88 + ((depth / Math.max(orbitRadius, 1)) * .1));
-    });
-  };
-  const nodesOverlap = () => {
-    const bounds = orbitalNodes.map((node) => node.getBoundingClientRect());
-    return bounds.some((node, index) => bounds.slice(index + 1).some((other) => (
-      node.left < other.right + collisionGap
-      && node.right + collisionGap > other.left
-      && node.top < other.bottom + collisionGap
-      && node.bottom + collisionGap > other.top
-    )));
-  };
-  positionNodes();
-  for (let attempt = 0; attempt < 12 && nodesOverlap(); attempt += 1) {
-    const reducedScale = Math.max(.12, nodeScale * .9);
-    if (reducedScale === nodeScale) break;
-    nodeScale = reducedScale;
-    positionNodes();
-  }
-  if (document.body.classList.contains("orbit-open") && !document.hidden && !introReducedMotion) {
-    orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
-  } else {
-    orbitAnimationFrame = 0;
-  }
-};
-
-const startOrbitalMotion = () => {
-  if (orbitAnimationFrame || !orbitalNodes.length) return;
-  orbitAnimationStartedAt = performance.now();
-  orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
-};
-
-const stopOrbitalMotion = () => {
-  if (!orbitAnimationFrame) return;
-  window.cancelAnimationFrame(orbitAnimationFrame);
-  orbitAnimationFrame = 0;
-};
-
-orbitalNodes.forEach((node) => {
-  node.addEventListener("pointerenter", stopOrbitalMotion);
-  node.addEventListener("pointerleave", () => {
-    if (document.body.classList.contains("orbit-open")) startOrbitalMotion();
-  });
-});
-
-orbitSelector?.addEventListener("transitionend", startOrbitalMotion);
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) stopOrbitalMotion();
-  else if (document.body.classList.contains("orbit-open")) startOrbitalMotion();
-});
-
-const revealObserver = new IntersectionObserver((entries, observer) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("visible");
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12 });
-
-document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
-
-const observedNavSections = [...navSections];
-const navObserver = new IntersectionObserver((entries) => {
-  if (document.body.classList.contains("fullscreen-sections")) return;
-  const visibleSection = entries
-    .filter((entry) => entry.isIntersecting)
-    .sort((first, second) => second.intersectionRatio - first.intersectionRatio)[0];
-  if (!visibleSection) return;
-  navSectionLinks.forEach((link) => {
-    link.classList.toggle("active", isSectionLinkFor(link, visibleSection.target.id));
-  });
-}, { rootMargin: "-96px 0px -55% 0px", threshold: [0.1, 0.35, 0.6] });
-
-observedNavSections.forEach((section) => navObserver.observe(section));
-document.body.classList.add("fullscreen-sections");
-document.body.classList.add("orbit-open", "permanent-orbit");
-orbitSelector?.setAttribute("aria-hidden", "false");
-startOrbitalMotion();
-
-document.querySelectorAll('a[href^="#"]').forEach((link) => {
-  link.addEventListener("click", (event) => {
-    const targetId = link.getAttribute("href")?.slice(1);
-    if (!targetId || !sectionIds.includes(targetId)) return;
-    event.preventDefault();
-    navigateToSection(targetId);
-  });
-});
-
-window.addEventListener("popstate", () => {
-  const requestedHash = window.location.hash.slice(1);
-  if (!requestedHash) {
-    showOrbitView({ updateHistory: false });
-    return;
-  }
-  const requestedId = sectionIds.includes(requestedHash) ? requestedHash : "home";
-  showSectionView();
-  if (requestedId === activeSectionId) return;
-  if (window.matchMedia("(max-width: 800px)").matches) {
-    activateMobileSection(requestedId);
-    return;
-  }
-  setActiveSection(requestedId, { updateHistory: false, focus: true });
-});
-
-sectionOrbitReturn?.addEventListener("click", () => showOrbitView());
-
-document.addEventListener("keydown", (event) => {
-  if (sectionTransitioning || projectModal?.hidden === false || navLinks?.classList.contains("open")) return;
-  if (!["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(event.key)) return;
-  const currentIndex = sectionIds.indexOf(activeSectionId);
-  const direction = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1;
-  const nextIndex = Math.min(Math.max(currentIndex + direction, 0), sectionIds.length - 1);
-  if (nextIndex === currentIndex) return;
-  event.preventDefault();
-  setActiveSection(sectionIds[nextIndex]);
 });
 
 const updateNavigation = () => {
@@ -558,12 +242,15 @@ const updateNavigation = () => {
 };
 
 window.addEventListener("scroll", updateNavigation, { passive: true });
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 700) closeMobileNavigation();
+  updateNavigation();
+});
 updateNavigation();
 
 backToTop?.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 });
-
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const selectedFilter = button.dataset.filter;
@@ -579,96 +266,96 @@ filterButtons.forEach((button) => {
       card.classList.toggle("is-hidden", !shouldShow);
     });
   });
+});
 
-  const contactForm = document.querySelector("#contact-form");
-  const formStatus = document.querySelector("#form-status");
-  const emailAppButton = document.querySelector("#open-email-app");
-  const copyrightYear = document.querySelector("#copyright-year");
+const contactForm = document.querySelector("#contact-form");
+const formStatus = document.querySelector("#form-status");
+const emailAppButton = document.querySelector("#open-email-app");
+const copyrightYear = document.querySelector("#copyright-year");
 
-  if (copyrightYear) copyrightYear.textContent = String(new Date().getFullYear());
+if (copyrightYear) copyrightYear.textContent = String(new Date().getFullYear());
 
-  const contactFields = [
-    { input: "contact-name", error: "contact-name-error", message: "Please enter your name." },
-    { input: "contact-email", error: "contact-email-error", message: "Please enter a valid email address." },
-    { input: "contact-subject", error: "contact-subject-error", message: "Please enter a subject." },
-    { input: "contact-message", error: "contact-message-error", message: "Please enter a message." }
-  ];
+const contactFields = [
+  { input: "contact-name", error: "contact-name-error", message: "Please enter your name." },
+  { input: "contact-email", error: "contact-email-error", message: "Please enter a valid email address." },
+  { input: "contact-subject", error: "contact-subject-error", message: "Please enter a subject." },
+  { input: "contact-message", error: "contact-message-error", message: "Please enter a message." }
+];
 
-  const validateContactField = (field) => {
-    const input = document.querySelector(`#${field.input}`);
-    const error = document.querySelector(`#${field.error}`);
-    const wrapper = input?.closest(".form-field");
-    if (!input || !error || !wrapper) return false;
-    let message = "";
-    if (!input.value.trim()) message = field.message;
-    else if (input.type === "email" && !input.validity.valid) message = field.message;
-    error.textContent = message;
-    wrapper.classList.toggle("has-error", Boolean(message));
-    input.setAttribute("aria-invalid", String(Boolean(message)));
-    return !message;
-  };
+const validateContactField = (field) => {
+  const input = document.querySelector(`#${field.input}`);
+  const error = document.querySelector(`#${field.error}`);
+  const wrapper = input?.closest(".form-field");
+  if (!input || !error || !wrapper) return false;
+  let message = "";
+  if (!input.value.trim()) message = field.message;
+  else if (input.type === "email" && !input.validity.valid) message = field.message;
+  error.textContent = message;
+  wrapper.classList.toggle("has-error", Boolean(message));
+  input.setAttribute("aria-invalid", String(Boolean(message)));
+  return !message;
+};
 
-  contactFields.forEach((field) => {
-    document.querySelector(`#${field.input}`)?.addEventListener("input", () => {
-      validateContactField(field);
-      if (formStatus) {
-        formStatus.textContent = "";
-        formStatus.classList.remove("is-error");
-      }
-    });
-  });
-
-  contactForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const isValid = contactFields.map(validateContactField).every(Boolean);
-    if (!isValid) {
-      if (formStatus) {
-        formStatus.textContent = "Please review the highlighted fields.";
-        formStatus.classList.add("is-error");
-      }
-      return;
-    }
-    const submitButton = contactForm.querySelector(".form-submit");
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.setAttribute("aria-busy", "true");
-    }
+contactFields.forEach((field) => {
+  document.querySelector(`#${field.input}`)?.addEventListener("input", () => {
+    validateContactField(field);
     if (formStatus) {
-      formStatus.textContent = "Sending your message...";
+      formStatus.textContent = "";
       formStatus.classList.remove("is-error");
     }
-    if (emailAppButton) emailAppButton.hidden = true;
+  });
+});
 
-    try {
-      const response = await fetch(contactForm.action, {
-        method: "POST",
-        body: new FormData(contactForm),
-        headers: { Accept: "application/json" }
-      });
-      if (!response.ok) throw new Error(`Form submission failed with status ${response.status}.`);
-      contactForm.reset();
-      if (formStatus) formStatus.textContent = "Thanks for reaching out! Your message was sent successfully.";
-    } catch (error) {
-      console.error("Contact form submission failed:", error);
-      if (formStatus) {
-        formStatus.textContent = "Your message could not be sent right now. Please try again or email me directly.";
-        formStatus.classList.add("is-error");
-      }
-      if (emailAppButton) emailAppButton.hidden = false;
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.removeAttribute("aria-busy");
-      }
+contactForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const isValid = contactFields.map(validateContactField).every(Boolean);
+  if (!isValid) {
+    if (formStatus) {
+      formStatus.textContent = "Please review the highlighted fields.";
+      formStatus.classList.add("is-error");
     }
-  });
+    return;
+  }
+  const submitButton = contactForm.querySelector(".form-submit");
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.setAttribute("aria-busy", "true");
+  }
+  if (formStatus) {
+    formStatus.textContent = "Sending your message...";
+    formStatus.classList.remove("is-error");
+  }
+  if (emailAppButton) emailAppButton.hidden = true;
 
-  emailAppButton?.addEventListener("click", () => {
-    const name = document.querySelector("#contact-name")?.value.trim() ?? "";
-    const email = document.querySelector("#contact-email")?.value.trim() ?? "";
-    const subject = document.querySelector("#contact-subject")?.value.trim() ?? "";
-    const message = document.querySelector("#contact-message")?.value.trim() ?? "";
-    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    window.location.href = `mailto:krishnaprasadkurmi99@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  });
+  try {
+    const response = await fetch(contactForm.action, {
+      method: "POST",
+      body: new FormData(contactForm),
+      headers: { Accept: "application/json" }
+    });
+    if (!response.ok) throw new Error(`Form submission failed with status ${response.status}.`);
+    contactForm.reset();
+    if (formStatus) formStatus.textContent = "Thanks for reaching out! Your message was sent successfully.";
+  } catch (error) {
+    console.error("Contact form submission failed:", error);
+    if (formStatus) {
+      formStatus.textContent = "Your message could not be sent right now. Please try again or email me directly.";
+      formStatus.classList.add("is-error");
+    }
+    if (emailAppButton) emailAppButton.hidden = false;
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.removeAttribute("aria-busy");
+    }
+  }
+});
+
+emailAppButton?.addEventListener("click", () => {
+  const name = document.querySelector("#contact-name")?.value.trim() ?? "";
+  const email = document.querySelector("#contact-email")?.value.trim() ?? "";
+  const subject = document.querySelector("#contact-subject")?.value.trim() ?? "";
+  const message = document.querySelector("#contact-message")?.value.trim() ?? "";
+  const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+  window.location.href = `mailto:krishnaprasadkurmi99@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
