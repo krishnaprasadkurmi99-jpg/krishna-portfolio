@@ -354,34 +354,74 @@ orbitTargets.forEach((button) => {
 
 const orbitalNodes = [...document.querySelectorAll(".orbit-node")];
 const orbitSystem = document.querySelector(".orbit-system");
-const orbitalMotion = [
-  { radiusX: 218, radiusY: 108, speed: 0.00016, depth: 12 },
-  { radiusX: 218, radiusY: 108, speed: 0.00016, depth: 12 },
-  { radiusX: 218, radiusY: 108, speed: 0.00016, depth: 12 },
-  { radiusX: 175, radiusY: 76, speed: -0.00022, depth: 28 },
-  { radiusX: 175, radiusY: 76, speed: -0.00022, depth: 28 },
-  { radiusX: 175, radiusY: 76, speed: -0.00022, depth: 28 }
-];
 
 const renderOrbitalNodes = (timestamp) => {
   if (!orbitAnimationStartedAt) orbitAnimationStartedAt = timestamp;
   const elapsed = timestamp - orbitAnimationStartedAt;
-  const system = document.querySelector(".orbit-system");
-  const systemWidth = system?.getBoundingClientRect().width || 680;
+  const { width, height } = orbitSystem?.getBoundingClientRect() ?? { width: 680, height: 680 };
   const isMobileOrbit = window.matchMedia("(max-width: 800px)").matches;
-  const orbitScale = isMobileOrbit
-    ? Math.min(1, Math.max(.62, (systemWidth / 2 - 58) / 218))
-    : Math.min(1, Math.max(.45, (systemWidth / 2 - 72) / 218));
+  const nodeSize = orbitalNodes.map((node) => ({ width: node.offsetWidth, height: node.offsetHeight }));
+  const nodeWidth = Math.max(...nodeSize.map((size) => size.width)) || (isMobileOrbit ? 108 : 145);
+  const nodeHeight = Math.max(...nodeSize.map((size) => size.height)) || (isMobileOrbit ? 66 : 83);
+  const padding = isMobileOrbit ? 9 : 16;
+  const systemRadius = Math.min(width, height) / 2 - padding;
+  const systemBounds = orbitSystem?.getBoundingClientRect();
+  const centerY = systemBounds ? systemBounds.top + systemBounds.height / 2 : window.innerHeight / 2;
+  const headingBottom = document.querySelector(".orbit-heading")?.getBoundingClientRect().bottom ?? 0;
+  const hintTop = document.querySelector(".orbit-hint")?.getBoundingClientRect().top ?? window.innerHeight;
+  const tilt = 54 * Math.PI / 180;
+  const planeRotation = -15 * Math.PI / 180;
+  const cosTilt = Math.cos(tilt);
+  const cosRotation = Math.cos(planeRotation);
+  const sinRotation = Math.sin(planeRotation);
+  const xExtent = 1;
+  const yExtent = cosTilt;
+  const topClearance = centerY - headingBottom - nodeHeight / 2 - 14;
+  const bottomClearance = hintTop - centerY - nodeHeight / 2 - 14;
+  const horizontalClearance = Math.min(window.innerWidth / 2, width / 2) - nodeWidth / 2 - padding;
+  const orbitRadius = Math.max(0, Math.min(
+    systemRadius * .94,
+    horizontalClearance / xExtent,
+    topClearance / yExtent,
+    bottomClearance / yExtent
+  ));
+  const angularSpeed = .00016;
+  const positions = orbitalNodes.map((_, index) => {
+    const angle = (Math.PI * 2 * index) / orbitalNodes.length + elapsed * angularSpeed;
+    const localX = Math.cos(angle) * orbitRadius;
+    const localY = Math.sin(angle) * orbitRadius;
+    const rotatedX = localX * cosRotation - localY * sinRotation;
+    const rotatedY = localX * sinRotation + localY * cosRotation;
+    return {
+      x: rotatedX,
+      y: rotatedY * cosTilt,
+      depth: rotatedY * Math.sin(tilt)
+    };
+  });
+  let nodeScale = 1;
+  const collisionGap = isMobileOrbit ? 8 : 14;
+  positions.forEach((position, index) => {
+    positions.slice(index + 1).forEach((other, offset) => {
+      const otherIndex = index + offset + 1;
+      const centerDistanceX = Math.abs(position.x - other.x);
+      const centerDistanceY = Math.abs(position.y - other.y);
+      const combinedWidth = (nodeSize[index].width + nodeSize[otherIndex].width) / 2;
+      const combinedHeight = (nodeSize[index].height + nodeSize[otherIndex].height) / 2;
+      const maxSafeScale = Math.max(
+        (centerDistanceX - collisionGap) / combinedWidth,
+        (centerDistanceY - collisionGap) / combinedHeight
+      );
+      nodeScale = Math.min(nodeScale, maxSafeScale);
+    });
+  });
+  nodeScale = Math.max(.3, Math.min(1, nodeScale));
   orbitalNodes.forEach((node, index) => {
-    const motion = orbitalMotion[index];
-    const phase = Number(node.dataset.orbitPhase || 0);
-    const angle = phase + elapsed * motion.speed;
-    const x = Math.cos(angle) * motion.radiusX * orbitScale;
-    const y = Math.sin(angle) * motion.radiusY * orbitScale;
-    const depth = Math.sin(angle) * motion.depth;
-    const scale = 1 + (Math.sin(angle) * 0.04);
+    const { x, y, depth } = positions[index];
+    const depthScale = 0.9 + ((depth / Math.max(orbitRadius, 1)) * .1);
+    const scale = nodeScale * depthScale;
     node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${depth}px) scale(${scale})`;
-    node.style.zIndex = String(Math.round(10 + depth));
+    node.style.zIndex = String(depth < 0 ? 2 : 12);
+    node.style.opacity = String(0.88 + ((depth / Math.max(orbitRadius, 1)) * .1));
   });
   if (document.body.classList.contains("orbit-open") && !document.hidden && !introReducedMotion) {
     orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
@@ -391,7 +431,7 @@ const renderOrbitalNodes = (timestamp) => {
 };
 
 const startOrbitalMotion = () => {
-  if (orbitAnimationFrame || introReducedMotion || !orbitalNodes.length) return;
+  if (orbitAnimationFrame || !orbitalNodes.length) return;
   orbitAnimationStartedAt = performance.now();
   orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
 };
