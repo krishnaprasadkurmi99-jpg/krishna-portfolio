@@ -398,15 +398,25 @@ const renderOrbitalNodes = (timestamp) => {
       depth: rotatedY * Math.sin(tilt)
     };
   });
+  const perspective = 1100;
+  const projectedPositions = positions.map((position, index) => {
+    const perspectiveScale = perspective / (perspective - position.depth);
+    const depthScale = 0.9 + ((position.depth / Math.max(orbitRadius, 1)) * .1);
+    return {
+      x: position.x * perspectiveScale,
+      y: position.y * perspectiveScale,
+      width: nodeSize[index].width * perspectiveScale * depthScale,
+      height: nodeSize[index].height * perspectiveScale * depthScale
+    };
+  });
   let nodeScale = 1;
   const collisionGap = isMobileOrbit ? 8 : 14;
-  positions.forEach((position, index) => {
-    positions.slice(index + 1).forEach((other, offset) => {
-      const otherIndex = index + offset + 1;
+  projectedPositions.forEach((position, index) => {
+    projectedPositions.slice(index + 1).forEach((other) => {
       const centerDistanceX = Math.abs(position.x - other.x);
       const centerDistanceY = Math.abs(position.y - other.y);
-      const combinedWidth = (nodeSize[index].width + nodeSize[otherIndex].width) / 2;
-      const combinedHeight = (nodeSize[index].height + nodeSize[otherIndex].height) / 2;
+      const combinedWidth = (position.width + other.width) / 2;
+      const combinedHeight = (position.height + other.height) / 2;
       const maxSafeScale = Math.max(
         (centerDistanceX - collisionGap) / combinedWidth,
         (centerDistanceY - collisionGap) / combinedHeight
@@ -415,16 +425,34 @@ const renderOrbitalNodes = (timestamp) => {
     });
   });
   nodeScale = Math.max(.3, Math.min(1, nodeScale));
-  orbitalNodes.forEach((node, index) => {
-    const { x, y, depth } = positions[index];
-    const depthScale = 0.9 + ((depth / Math.max(orbitRadius, 1)) * .1);
-    const scale = nodeScale * depthScale;
-    node.style.left = "50%";
-    node.style.top = "50%";
-    node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${depth}px) scale(${scale})`;
-    node.style.zIndex = String(depth < 0 ? 2 : 12);
-    node.style.opacity = String(0.88 + ((depth / Math.max(orbitRadius, 1)) * .1));
-  });
+  const positionNodes = () => {
+    orbitalNodes.forEach((node, index) => {
+      const { x, y, depth } = positions[index];
+      const depthScale = 0.9 + ((depth / Math.max(orbitRadius, 1)) * .1);
+      const scale = nodeScale * depthScale;
+      node.style.left = "50%";
+      node.style.top = "50%";
+      node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${depth}px) scale(${scale})`;
+      node.style.zIndex = String(depth < 0 ? 2 : 12);
+      node.style.opacity = String(0.88 + ((depth / Math.max(orbitRadius, 1)) * .1));
+    });
+  };
+  const nodesOverlap = () => {
+    const bounds = orbitalNodes.map((node) => node.getBoundingClientRect());
+    return bounds.some((node, index) => bounds.slice(index + 1).some((other) => (
+      node.left < other.right + collisionGap
+      && node.right + collisionGap > other.left
+      && node.top < other.bottom + collisionGap
+      && node.bottom + collisionGap > other.top
+    )));
+  };
+  positionNodes();
+  for (let attempt = 0; attempt < 12 && nodesOverlap(); attempt += 1) {
+    const reducedScale = Math.max(.12, nodeScale * .9);
+    if (reducedScale === nodeScale) break;
+    nodeScale = reducedScale;
+    positionNodes();
+  }
   if (document.body.classList.contains("orbit-open") && !document.hidden && !introReducedMotion) {
     orbitAnimationFrame = window.requestAnimationFrame(renderOrbitalNodes);
   } else {
