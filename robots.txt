@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://krishna-portfolio.krishnaprasadkurmi99.workers.dev/sitemap.xml
