@@ -419,6 +419,8 @@ const renderOrbitalNodes = (timestamp) => {
     const { x, y, depth } = positions[index];
     const depthScale = 0.9 + ((depth / Math.max(orbitRadius, 1)) * .1);
     const scale = nodeScale * depthScale;
+    node.style.left = "50%";
+    node.style.top = "50%";
     node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${depth}px) scale(${scale})`;
     node.style.zIndex = String(depth < 0 ? 2 : 12);
     node.style.opacity = String(0.88 + ((depth / Math.max(orbitRadius, 1)) * .1));
