@@ -401,59 +401,8 @@ main.page-content > section { animation: page-enter .22s ease-out both; }
 .print-jobs { display: grid; gap: 7px; }
 .print-jobs i { display: block; height: 31px; border: 1px solid #ded9d6; border-radius: 7px; background: #fff; }
 .print-jobs i::before { display: block; width: 21px; height: 21px; margin: 4px; border-radius: 4px; background: #eee7e4; content: ""; }
-.project-preview--smartprint { background: #10191d; }
-.project-preview--smartprint img { width: 100%; height: 100%; min-height: 190px; object-fit: cover; object-position: top center; }
-.project-preview--campusly { display: flex; gap: 14px; padding: 18px; background: #f0eeec; }
-.campusly-sidebar { display: flex; width: 38px; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 13px; padding: 10px 7px; border-radius: 9px; background: #dedad7; }
-.campusly-sidebar b { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 6px; background: var(--accent); color: #fff; font: 600 11px var(--display); }
-.campusly-sidebar i { width: 13px; height: 5px; border-radius: 4px; background: #bdb7b3; }
-.campusly-sidebar i:first-of-type { background: #8d8580; }
-.campusly-content { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 8px 4px; }
-.campusly-content small { color: var(--accent); font: 600 8px var(--display); letter-spacing: .13em; }
-.campusly-content > strong { margin: 5px 0 12px; font: 600 14px var(--display); }
-.campusly-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-.campusly-metrics i { display: grid; gap: 7px; padding: 9px; border: 1px solid #ded9d6; border-radius: 7px; background: #fff; }
-.campusly-metrics b { height: 4px; border-radius: 4px; background: #ded9d6; }
-.campusly-metrics b:first-child { width: 55%; background: #c18b87; }
-.campusly-chart { display: flex; height: 44px; align-items: flex-end; gap: 7px; margin-top: 9px; padding: 7px 10px; border: 1px solid #ded9d6; border-radius: 7px; background: #fff; }
-.campusly-chart i { flex: 1; height: 45%; border-radius: 3px 3px 0 0; background: #c18b87; }
-.campusly-chart i:nth-child(2n) { height: 75%; background: #d7ceca; }
-.campusly-chart i:nth-child(3n) { height: 60%; }
-.project-preview--elevix { display: flex; gap: 14px; padding: 18px; background: #f0eeec; }
-.elevix-sidebar { display: flex; width: 38px; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 15px; padding: 10px 7px; border-radius: 9px; background: #dedad7; }
-.elevix-sidebar b { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 6px; background: var(--accent); color: #fff; font: 600 11px var(--display); }
-.elevix-sidebar i { width: 13px; height: 5px; border-radius: 4px; background: #bdb7b3; }
-.elevix-sidebar i:first-of-type { background: #8d8580; }
-.elevix-content { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 8px 4px; }
-.elevix-content small { color: var(--accent); font: 600 8px var(--display); letter-spacing: .13em; }
-.elevix-content > strong { margin: 5px 0 10px; font: 600 14px var(--display); }
-.elevix-score { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border: 1px solid #ded9d6; border-radius: 7px; background: #fff; }
-.elevix-score b { color: var(--accent); font: 600 17px var(--display); }
-.elevix-score span { color: var(--muted); font-size: 8px; }
-.elevix-score i { width: 7px; height: 7px; margin-left: auto; border-radius: 50%; background: #8b9b78; }
-.elevix-skills { display: flex; gap: 6px; margin-top: 9px; }
-.elevix-skills i { width: 25%; height: 5px; border-radius: 4px; background: #c18b87; }
-.elevix-skills i:nth-child(even) { background: #d7ceca; }
-.elevix-report { height: 38px; margin-top: 9px; border: 1px solid #ded9d6; border-radius: 7px; background: repeating-linear-gradient(to bottom, #fff 0 8px, #e8e3e0 8px 9px); }
-.project-preview--mindspace { display: flex; gap: 14px; padding: 18px; background: #f0eeec; }
-.mindspace-sidebar { display: flex; width: 38px; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 14px; padding: 10px 7px; border-radius: 9px; background: #dedad7; }
-.mindspace-sidebar b { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 6px; background: var(--accent); color: #fff; font: 600 11px var(--display); }
-.mindspace-sidebar i { width: 13px; height: 5px; border-radius: 4px; background: #bdb7b3; }
-.mindspace-sidebar i:first-of-type { background: #8d8580; }
-.mindspace-content { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 8px 4px; }
-.mindspace-content small { color: var(--accent); font: 600 8px var(--display); letter-spacing: .13em; }
-.mindspace-content > strong { margin: 5px 0 10px; font: 600 14px var(--display); }
-.mindspace-progress { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px solid #ded9d6; border-radius: 7px; background: #fff; }
-.mindspace-progress i { width: 22px; height: 22px; border: 3px solid #e8e3e0; border-top-color: var(--accent); border-radius: 50%; }
-.mindspace-progress span { color: var(--muted); font-size: 8px; }
-.mindspace-tasks { display: grid; gap: 6px; margin-top: 8px; }
-.mindspace-tasks i { display: flex; align-items: center; gap: 7px; padding: 6px 8px; border: 1px solid #ded9d6; border-radius: 6px; background: #fff; }
-.mindspace-tasks b { width: 8px; height: 8px; border: 1px solid #c18b87; border-radius: 3px; }
-.mindspace-tasks i:first-child b { background: var(--accent); }
-.mindspace-tasks span { width: 45%; height: 4px; border-radius: 4px; background: #ded9d6; }
-.mindspace-focus { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 6px 9px; border-radius: 6px; background: #e8e3e0; }
-.mindspace-focus b { color: var(--ink); font: 600 11px var(--display); }
-.mindspace-focus span { color: var(--muted); font: 600 7px var(--display); letter-spacing: .08em; }
+.project-preview--screenshot { background: #101116; }
+.project-preview--screenshot img { width: 100%; height: 100%; min-height: 190px; object-fit: cover; object-position: top center; }
 .showcase-info { min-width: 0; padding: clamp(20px, 2.6vw, 30px); }
 .showcase-topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .project-type { margin: 0; font-size: 8px; }

@@ -79,6 +79,7 @@ const projects = [
     features: ["Upload PDF documents, review automated page analysis, choose print preferences, and see estimated pricing in INR.", "Classify color and black-and-white pages, detect blank and duplicate pages, and provide print recommendations through automated analysis.", "Manage order statuses, customer history, saved printing profiles, and reprints from the shop-owner dashboard.", "Track orders with customer tracking links, pickup PINs, and QR codes.", "Protect documents with private Supabase Storage, signed upload and download URLs, upload validation, and temporary-file cleanup.", "Use session-based authentication, login throttling, upload limits, and database migrations for backend protections."],
     contribution: ["Built SmartPrint, a full-stack print-shop management app with PDF analysis, customer order tracking, owner workflows, and private cloud storage.", "Connected the React and TypeScript frontend to a FastAPI and MySQL backend, with private document storage in Supabase.", "Implemented automated PDF analysis and customer and shop-owner order workflows."],
     context: "PDF analysis is automated and does not use generative AI. The frontend is deployed on Vercel, the FastAPI backend on Render, MySQL is hosted on Aiven, and Supabase Storage holds private files.",
+    status: "Live",
     github: "",
     demo: "https://smart-print-alpha.vercel.app/",
     visual: "smartprint",
@@ -98,7 +99,8 @@ const projects = [
     status: "Live",
     github: "",
     demo: "https://campusly-eight-mauve.vercel.app/",
-    visual: "campusly"
+    visual: "campusly",
+    screenshots: [{ src: "project-images/campusly-student-management.png", alt: "Campusly student-management dashboard showing student, course, attendance, and fee overview cards." }]
   },
   {
     id: "elevix",
@@ -114,7 +116,8 @@ const projects = [
     status: "Live",
     github: "",
     demo: "https://resume-analyzer-gamma-rouge.vercel.app/",
-    visual: "elevix"
+    visual: "elevix",
+    screenshots: [{ src: "project-images/elevix-resume-analyzer.png", alt: "Elevix resume-analysis dashboard with resume upload and evidence-based career insights." }]
   },
   {
     id: "mindspace",
@@ -130,28 +133,21 @@ const projects = [
     status: "Live",
     github: "",
     demo: "https://personal-task-manager-five-pink.vercel.app/",
-    visual: "mindspace"
+    visual: "mindspace",
+    screenshots: [{ src: "project-images/mindspace-productivity.png", alt: "MINDSPACE productivity dashboard with task progress, focus streaks, and weekly insights." }]
   }
 ];
 
-const createProjectVisual = (visual) => {
+const createProjectVisual = (visual, screenshots = []) => {
+  if (screenshots.length) {
+    const [screenshot] = screenshots;
+    return `<div class="project-preview project-preview--screenshot"><img src="${screenshot.src}" alt="${screenshot.alt}" loading="lazy"></div>`;
+  }
   if (visual === "emergency") {
     return `<div class="project-preview project-preview--emergency" aria-hidden="true"><div class="map-grid"></div><span class="map-route"></span><span class="map-marker marker-ambulance">✚</span><span class="map-marker marker-hospital">+</span><span class="map-marker marker-hospital marker-hospital-two">+</span><div class="emergency-panel"><small>LIVE RESPONSE</small><strong>3 ACTIVE CASES</strong><i></i><i></i><i></i></div></div>`;
   }
   if (visual === "retail") {
     return `<div class="project-preview project-preview--retail" aria-hidden="true"><div class="store-header"><span>shop.</span><b>⌕</b><b>◌</b></div><div class="store-products"><i></i><i></i><i></i></div><div class="store-product-lines"><b></b><b></b><b></b></div></div>`;
-  }
-  if (visual === "campusly") {
-    return `<div class="project-preview project-preview--campusly" aria-hidden="true"><div class="campusly-sidebar"><b>C</b><i></i><i></i><i></i><i></i></div><div class="campusly-content"><small>STUDENT OVERVIEW</small><strong>Campusly</strong><div class="campusly-metrics"><i><b></b><b></b></i><i><b></b><b></b></i><i><b></b><b></b></i></div><div class="campusly-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
-  }
-  if (visual === "elevix") {
-    return `<div class="project-preview project-preview--elevix" aria-hidden="true"><div class="elevix-sidebar"><b>E</b><i></i><i></i><i></i></div><div class="elevix-content"><small>CAREER INTELLIGENCE</small><strong>Resume insights</strong><div class="elevix-score"><b>82</b><span>Resume readiness</span><i></i></div><div class="elevix-skills"><i></i><i></i><i></i><i></i></div><div class="elevix-report"></div></div></div>`;
-  }
-  if (visual === "mindspace") {
-    return `<div class="project-preview project-preview--mindspace" aria-hidden="true"><div class="mindspace-sidebar"><b>M</b><i></i><i></i><i></i><i></i></div><div class="mindspace-content"><small>YOUR DAY, IN FOCUS</small><strong>Today</strong><div class="mindspace-progress"><i></i><span>Tasks in progress</span></div><div class="mindspace-tasks"><i><b></b><span></span></i><i><b></b><span></span></i><i><b></b><span></span></i></div><div class="mindspace-focus"><b>25:00</b><span>FOCUS SESSION</span></div></div></div>`;
-  }
-  if (visual === "smartprint") {
-    return `<div class="project-preview project-preview--smartprint"><img src="project-images/smartprint-homepage.png" alt="SmartPrint customer ordering page with PDF upload, page analysis, and print checkout." loading="lazy"></div>`;
   }
   return `<div class="project-preview project-preview--printing" aria-hidden="true"><div class="print-sidebar"><i></i><i></i><i></i></div><div class="print-content"><small>PRINT QUEUE</small><strong>DOCUMENT WORKFLOW</strong><div class="print-jobs"><i></i><i></i><i></i></div></div></div>`;
 };
@@ -169,7 +165,7 @@ const renderFeaturedProjects = () => {
   const selectedProjects = [...featuredProjects, ...projects.filter((project) => !project.featured)].slice(0, 2);
   homeFeaturedProjects.innerHTML = selectedProjects.map((project) => `
     <article class="home-project-card">
-      <div class="home-project-preview">${createProjectVisual(project.visual)}</div>
+      <div class="home-project-preview">${createProjectVisual(project.visual, project.screenshots)}</div>
       <div class="home-project-info">
         <p class="project-type">${project.categoryLabel}</p>
         <h3><a href="/projects#${project.id}">${project.title}</a></h3>
@@ -186,7 +182,7 @@ const renderProjects = (filter = "all") => {
   const visibleProjects = projects.filter((project) => filter === "all" || project.categories.includes(filter));
   projectShowcase.innerHTML = visibleProjects.map((project, index) => `
     <article class="showcase-card ${project.featured ? "showcase-card--featured" : ""}" id="${project.id}" data-project-id="${project.id}">
-      ${createProjectVisual(project.visual)}
+      ${createProjectVisual(project.visual, project.screenshots)}
       <div class="showcase-info">
         <div class="showcase-topline"><p class="project-type">${project.categoryLabel}</p><span class="status-badge status-configurable">${project.status}</span></div>
         <h3>${project.title}</h3>
