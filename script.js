@@ -82,6 +82,38 @@ const projects = [
     github: "",
     demo: "",
     visual: "printing"
+  },
+  {
+    id: "campusly",
+    title: "Campusly — Student Management Dashboard",
+    categoryLabel: "STUDENT MANAGEMENT & ANALYTICS",
+    categories: ["web", "backend"],
+    description: "A responsive student-management platform for organizing student records, courses, academic progress, attendance, and fee balances in one workspace.",
+    problem: "Administrators need a central place to manage student records and academic operations while keeping attendance, grades, fees, and student support information easy to review.",
+    technologies: ["Python", "Flask", "SQLAlchemy", "JavaScript", "HTML", "CSS", "SQLite", "PostgreSQL", "Neon"],
+    features: ["Student directory with add, edit, search, filters, and CSV import for up to 500 records.", "Course catalog and student 360 profiles with attendance, grades, balances, and achievement badges.", "Attendance tracking, assessment results, and fee balances with manually recorded payments.", "Analytics dashboard with enrollment, attendance, outstanding fees, recent activity, and support insights.", "CSV reports, print/PDF reports, and private Neon object storage with expiring download links.", "Administrator setup and sign-in with hashed passwords and CSRF protection.", "Realtime student-count updates through Neon Realtime."],
+    contribution: ["Built the responsive student-management dashboard for student records, courses, attendance, grades, and fee tracking.", "Added analytics, CSV import/export, student profiles, administrator access, and report storage.", "Integrated Neon services for private report storage and realtime student-count updates."],
+    context: "Fee payments are recorded manually; the application does not process payments.",
+    status: "Live",
+    github: "",
+    demo: "https://campusly-eight-mauve.vercel.app/",
+    visual: "campusly"
+  },
+  {
+    id: "elevix",
+    title: "Elevix — Resume Analyzer & Career Intelligence",
+    categoryLabel: "RESUME ANALYSIS & CAREER PLANNING",
+    categories: ["web", "backend"],
+    description: "A responsive career-planning tool that analyzes resumes with transparent, rule-based checks and offers practical guidance for job-search preparation.",
+    problem: "Students and early-career candidates need clear feedback on resume structure, role alignment, and skill gaps, along with practical next steps for career preparation.",
+    technologies: ["Python", "FastAPI", "JavaScript", "HTML", "CSS", "PDF/DOCX parsing", "ReportLab"],
+    features: ["Analyze pasted resume text or upload PDF and DOCX files; review detected skills, strengths, and resume evidence.", "Use an ATS-style checklist, job-description matching, role recommendations, and a placement-readiness snapshot.", "Get a personalized 30/60/90-day learning roadmap and role-specific interview practice.", "Compare two resume versions and receive grounded bullet rewrites without invented achievements or metrics.", "Download PDF analysis reports and use the responsive dashboard with dark and light themes."],
+    contribution: ["Built a responsive resume analysis and career-planning app using FastAPI and JavaScript.", "Implemented transparent rule-based resume checks, job-description matching, career guidance, and grounded resume bullet suggestions.", "Added resume comparison and downloadable PDF reports while avoiding persistent storage of uploaded resumes."],
+    context: "Resume analysis is rule-based and does not require an external AI service or API key. Uploaded resumes are not persisted.",
+    status: "Live",
+    github: "",
+    demo: "https://resume-analyzer-gamma-rouge.vercel.app/",
+    visual: "elevix"
   }
 ];
 
@@ -91,6 +123,12 @@ const createProjectVisual = (visual) => {
   }
   if (visual === "retail") {
     return `<div class="project-preview project-preview--retail" aria-hidden="true"><div class="store-header"><span>shop.</span><b>⌕</b><b>◌</b></div><div class="store-products"><i></i><i></i><i></i></div><div class="store-product-lines"><b></b><b></b><b></b></div></div>`;
+  }
+  if (visual === "campusly") {
+    return `<div class="project-preview project-preview--campusly" aria-hidden="true"><div class="campusly-sidebar"><b>C</b><i></i><i></i><i></i><i></i></div><div class="campusly-content"><small>STUDENT OVERVIEW</small><strong>Campusly</strong><div class="campusly-metrics"><i><b></b><b></b></i><i><b></b><b></b></i><i><b></b><b></b></i></div><div class="campusly-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
+  }
+  if (visual === "elevix") {
+    return `<div class="project-preview project-preview--elevix" aria-hidden="true"><div class="elevix-sidebar"><b>E</b><i></i><i></i><i></i></div><div class="elevix-content"><small>CAREER INTELLIGENCE</small><strong>Resume insights</strong><div class="elevix-score"><b>82</b><span>Resume readiness</span><i></i></div><div class="elevix-skills"><i></i><i></i><i></i><i></i></div><div class="elevix-report"></div></div></div>`;
   }
   return `<div class="project-preview project-preview--printing" aria-hidden="true"><div class="print-sidebar"><i></i><i></i><i></i></div><div class="print-content"><small>PRINT QUEUE</small><strong>DOCUMENT WORKFLOW</strong><div class="print-jobs"><i></i><i></i><i></i></div></div></div>`;
 };
