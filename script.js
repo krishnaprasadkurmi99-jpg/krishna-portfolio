@@ -70,18 +70,19 @@ const projects = [
   },
   {
     id: "batch-printing",
-    title: "Smart Print Cloud – Online Print Ordering and Shop Management System",
-    categoryLabel: "PRINT MANAGEMENT & WEB DEVELOPMENT",
+    title: "SmartPrint — Print-Shop Management & Document Ordering",
+    categoryLabel: "PRINT-SHOP OPERATIONS & DOCUMENT ORDERING",
     categories: ["web", "backend"],
-    description: "A web-based print management platform that allows customers to upload PDF documents, receive automatic page-wise color/B&W analysis and pricing, place print orders, and track order progress using QR codes. Shop owners can manage print queues, merge documents, monitor inventory, and view business analytics.",
-    problem: "Customers often need to visit a print shop to check pricing and submit documents, while shop owners manually calculate pages, prices, and print queues. Managing multiple orders and separating black-and-white pages from color pages can be time-consuming, so the platform brings analysis, ordering, processing, and tracking into one workflow.",
-    technologies: ["Python", "FastAPI", "MySQL", "PyMuPDF", "Pydantic", "WebSockets", "QRCode", "JavaScript", "Tailwind CSS", "Chart.js"],
-    features: ["PDF document upload.", "Automatic page count calculation.", "Black-and-white and color page detection with automatic price calculation.", "B&W-only printing option and unique order IDs.", "QR-code-based order pickup and tracking with an order progress timeline.", "Owner print queue dashboard.", "Batch document merging with separate merged PDFs for black-and-white and color printing.", "Branch and printer management, inventory tracking, and revenue and order analytics.", "Customer notifications and WebSocket infrastructure for real-time updates."],
-    contribution: ["Designed the relational database schema for shops, customers, branches, printers, inventory, orders, history, notifications, and QR codes.", "Built FastAPI endpoints for authentication, uploads, orders, tracking, analytics, inventory, and notifications.", "Implemented PDF page classification using PyMuPDF rendering and RGB color analysis in main.py, with standalone analysis logic in pdf_scanner.py.", "Created QR-code order identification, pickup workflows, and batch PDF merging for B&W and color print files.", "Connected customer, tracking, and shop-owner interfaces to backend APIs with JavaScript fetch requests across index.html, admin.html, dashboard.html, and track.html."],
-    status: "Configurable",
+    description: "A full-stack print-shop management app where customers upload PDFs, review document analysis and print-cost estimates, and track orders while shop owners manage orders and shop operations from a responsive dashboard.",
+    problem: "Customers need a clear way to submit print-ready documents and understand pricing, while print shops need reliable tools to organize orders, customer history, printing preferences, and pickups.",
+    technologies: ["React", "TypeScript", "Vite", "FastAPI", "Python", "MySQL", "Aiven", "Supabase Storage", "Vercel", "Render"],
+    features: ["Upload PDF documents, review automated page analysis, choose print preferences, and see estimated pricing in INR.", "Classify color and black-and-white pages, detect blank and duplicate pages, and provide print recommendations through automated analysis.", "Manage order statuses, customer history, saved printing profiles, and reprints from the shop-owner dashboard.", "Track orders with customer tracking links, pickup PINs, and QR codes.", "Protect documents with private Supabase Storage, signed upload and download URLs, upload validation, and temporary-file cleanup.", "Use session-based authentication, login throttling, upload limits, and database migrations for backend protections."],
+    contribution: ["Built SmartPrint, a full-stack print-shop management app with PDF analysis, customer order tracking, owner workflows, and private cloud storage.", "Connected the React and TypeScript frontend to a FastAPI and MySQL backend, with private document storage in Supabase.", "Implemented automated PDF analysis and customer and shop-owner order workflows."],
+    context: "PDF analysis is automated and does not use generative AI. The frontend is deployed on Vercel, the FastAPI backend on Render, MySQL is hosted on Aiven, and Supabase Storage holds private files.",
     github: "",
-    demo: "",
-    visual: "printing"
+    demo: "https://smart-print-alpha.vercel.app/",
+    visual: "smartprint",
+    screenshots: [{ src: "project-images/smartprint-homepage.png", alt: "SmartPrint customer ordering page with PDF upload, page analysis, and print checkout." }]
   },
   {
     id: "campusly",
@@ -149,6 +150,9 @@ const createProjectVisual = (visual) => {
   if (visual === "mindspace") {
     return `<div class="project-preview project-preview--mindspace" aria-hidden="true"><div class="mindspace-sidebar"><b>M</b><i></i><i></i><i></i><i></i></div><div class="mindspace-content"><small>YOUR DAY, IN FOCUS</small><strong>Today</strong><div class="mindspace-progress"><i></i><span>Tasks in progress</span></div><div class="mindspace-tasks"><i><b></b><span></span></i><i><b></b><span></span></i><i><b></b><span></span></i></div><div class="mindspace-focus"><b>25:00</b><span>FOCUS SESSION</span></div></div></div>`;
   }
+  if (visual === "smartprint") {
+    return `<div class="project-preview project-preview--smartprint"><img src="project-images/smartprint-homepage.png" alt="SmartPrint customer ordering page with PDF upload, page analysis, and print checkout." loading="lazy"></div>`;
+  }
   return `<div class="project-preview project-preview--printing" aria-hidden="true"><div class="print-sidebar"><i></i><i></i><i></i></div><div class="print-content"><small>PRINT QUEUE</small><strong>DOCUMENT WORKFLOW</strong><div class="print-jobs"><i></i><i></i><i></i></div></div></div>`;
 };
 
@@ -206,6 +210,18 @@ const openProjectModal = (projectId, trigger) => {
   projectModal.querySelector("#modal-project-category").textContent = project.categoryLabel;
   projectModal.querySelector("#modal-project-title").textContent = project.title;
   projectModal.querySelector("#modal-project-description").textContent = project.description;
+  const screenshotContainer = projectModal.querySelector("#modal-project-screenshots");
+  screenshotContainer.replaceChildren();
+  (project.screenshots || []).forEach((screenshot) => {
+    const figure = document.createElement("figure");
+    const image = document.createElement("img");
+    image.src = screenshot.src;
+    image.alt = screenshot.alt;
+    image.loading = "lazy";
+    figure.append(image);
+    screenshotContainer.append(figure);
+  });
+  screenshotContainer.hidden = !(project.screenshots || []).length;
   projectModal.querySelector("#modal-project-tech").innerHTML = project.technologies.map((technology) => `<span>${technology}</span>`).join("");
   projectModal.querySelector("#modal-project-features").innerHTML = project.features.map((feature) => `<li>${feature}</li>`).join("");
   const problemElement = projectModal.querySelector("#modal-project-problem");
