@@ -114,6 +114,22 @@ const projects = [
     github: "",
     demo: "https://resume-analyzer-gamma-rouge.vercel.app/",
     visual: "elevix"
+  },
+  {
+    id: "mindspace",
+    title: "MINDSPACE — Personal Productivity Workspace",
+    categoryLabel: "PERSONAL PRODUCTIVITY & PLANNING",
+    categories: ["web"],
+    description: "A responsive productivity workspace for tasks, planning, focus sessions, habits, goals, and progress insights, designed to turn scattered thoughts into a more intentional daily routine.",
+    problem: "Keeping tasks, notes, schedules, focus time, and goals in separate tools makes it harder to plan intentionally and understand progress over time.",
+    technologies: ["React", "TypeScript", "Vite", "Supabase", "Recharts", "Framer Motion"],
+    features: ["Manage tasks with priorities, statuses, subtasks, list and Kanban views, search, filters, and sorting.", "Plan tasks and deadlines with month, week, and day calendar views, time blocks, and rescheduling.", "Capture searchable, tagged, categorized, pinnable notes and turn them into tasks.", "Generate and adjust daily schedules using selected tasks, estimates, working hours, energy level, and break preferences.", "Track focus sessions, habits, goals, milestones, and weekly reflections.", "Review productivity trends from task completions, focus sessions, habits, and goals."],
+    contribution: ["Built a responsive personal productivity app that brings task management, planning, focus sessions, habits, goals, and insights into one workspace.", "Implemented list and Kanban task views, calendar scheduling, Brain Dump notes, deterministic daily planning, and productivity tracking.", "Connected browser-stored tasks and schedules with Supabase-backed notes and productivity records."],
+    context: "Daily schedules are generated using deterministic planning rules, not AI. Tasks and schedules use browser storage while notes and productivity records use Supabase.",
+    status: "Live",
+    github: "",
+    demo: "https://personal-task-manager-five-pink.vercel.app/",
+    visual: "mindspace"
   }
 ];
 
@@ -129,6 +145,9 @@ const createProjectVisual = (visual) => {
   }
   if (visual === "elevix") {
     return `<div class="project-preview project-preview--elevix" aria-hidden="true"><div class="elevix-sidebar"><b>E</b><i></i><i></i><i></i></div><div class="elevix-content"><small>CAREER INTELLIGENCE</small><strong>Resume insights</strong><div class="elevix-score"><b>82</b><span>Resume readiness</span><i></i></div><div class="elevix-skills"><i></i><i></i><i></i><i></i></div><div class="elevix-report"></div></div></div>`;
+  }
+  if (visual === "mindspace") {
+    return `<div class="project-preview project-preview--mindspace" aria-hidden="true"><div class="mindspace-sidebar"><b>M</b><i></i><i></i><i></i><i></i></div><div class="mindspace-content"><small>YOUR DAY, IN FOCUS</small><strong>Today</strong><div class="mindspace-progress"><i></i><span>Tasks in progress</span></div><div class="mindspace-tasks"><i><b></b><span></span></i><i><b></b><span></span></i><i><b></b><span></span></i></div><div class="mindspace-focus"><b>25:00</b><span>FOCUS SESSION</span></div></div></div>`;
   }
   return `<div class="project-preview project-preview--printing" aria-hidden="true"><div class="print-sidebar"><i></i><i></i><i></i></div><div class="print-content"><small>PRINT QUEUE</small><strong>DOCUMENT WORKFLOW</strong><div class="print-jobs"><i></i><i></i><i></i></div></div></div>`;
 };
