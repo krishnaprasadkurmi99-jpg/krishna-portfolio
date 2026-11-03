@@ -9,6 +9,7 @@ const projectFilters = document.querySelectorAll(".project-filter");
 const projectModal = document.querySelector("#project-modal");
 const modalCloseButtons = document.querySelectorAll("[data-modal-close]");
 const achievementGrid = document.querySelector("#achievement-grid");
+const resumeProjectList = document.querySelector("#resume-projects");
 const backToTop = document.querySelector("#back-to-top");
 const modalFocusableSelector = "button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled])";
 let lastFocusedElement = null;
@@ -177,6 +178,17 @@ const renderFeaturedProjects = () => {
   `).join("");
 };
 
+const renderResumeProjects = () => {
+  if (!resumeProjectList) return;
+  resumeProjectList.innerHTML = projects.filter((project) => project.status === "Live").map((project) => `
+    <article class="resume-project">
+      <div class="resume-project-heading"><h3>${project.title}</h3>${project.demo ? `<a href="${project.demo}" target="_blank" rel="noopener noreferrer">Live project</a>` : ""}</div>
+      <ul>${project.contribution.slice(0, 2).map((item) => `<li>${item}</li>`).join("")}</ul>
+      <p class="resume-project-stack"><strong>Technologies:</strong> ${project.technologies.slice(0, 6).join(", ")}</p>
+    </article>
+  `).join("");
+};
+
 const renderProjects = (filter = "all") => {
   if (!projectShowcase) return;
   const visibleProjects = projects.filter((project) => filter === "all" || project.categories.includes(filter));
@@ -247,6 +259,7 @@ const closeProjectModal = () => {
 };
 
 renderFeaturedProjects();
+renderResumeProjects();
 renderProjects();
 renderAchievements();
 
@@ -343,6 +356,8 @@ const emailAppButton = document.querySelector("#open-email-app");
 const copyrightYear = document.querySelector("#copyright-year");
 
 if (copyrightYear) copyrightYear.textContent = String(new Date().getFullYear());
+
+document.querySelector("#print-resume")?.addEventListener("click", () => window.print());
 
 const contactFields = [
   { input: "contact-name", error: "contact-name-error", message: "Please enter your name." },

@@ -17,7 +17,8 @@ No framework, build step, or backend service is required.
 - `skills.html` — Programming, web, database, and developer-tool skills
 - `projects.html` — Project portfolio, category filters, and accessible project details
 - `education.html` — College, degree, academic timeline, and learning milestones
-- `contact.html` — Contact details, résumé request, and Formspree-powered contact form
+- `contact.html` — Contact details, generated résumé link, and Formspree-powered contact form
+- `resume.html` — Portfolio-backed résumé with print and Save as PDF support
 
 Every page uses the shared responsive Bento Grid styling and a consistent navigation bar with regular HTML page links.
 
@@ -33,7 +34,7 @@ The site can also be opened directly in a browser. All pages, styles, scripts, a
 ## GitHub Pages Deployment
 
 1. Create a new GitHub repository, or select an existing repository for this portfolio.
-2. Place all six HTML pages, `style.css`, `script.js`, `profile-photo.png`, `sitemap.xml`, and this `README.md` in the repository root.
+2. Place all seven HTML pages, `style.css`, `script.js`, `profile-photo.png`, `sitemap.xml`, and this `README.md` in the repository root.
 3. Confirm that `index.html` is directly at the root level, not inside another folder.
 4. Commit and push the files to the `main` branch using Git or upload them through GitHub.
 5. Open the repository's **Settings**.
