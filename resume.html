@@ -20,27 +20,24 @@
   <main class="resume-document" id="main-content">
     <aside class="resume-sidebar" aria-label="Contact information and skills">
       <img class="resume-portrait" src="profile-photo.png" alt="Krishna Prasad Kurmi">
-      <h1>Krishna Prasad Kurmi</h1>
-      <p class="resume-sidebar-role">Computer Science &amp; Engineering Student</p>
+      <h1 data-portfolio="person.name">Krishna Prasad Kurmi</h1>
+      <p class="resume-sidebar-role" data-portfolio="person.role">Computer Science &amp; Engineering Student</p>
       <section class="resume-sidebar-section" aria-labelledby="resume-details-title">
         <h2 id="resume-details-title">Details</h2>
-        <a href="mailto:krishnaprasadkurmi99@gmail.com"><small>Email</small><span>krishnaprasadkurmi99@gmail.com</span></a>
-        <a href="https://github.com/krishnaprasadkurmi99-jpg"><small>GitHub</small><span>krishnaprasadkurmi99-jpg</span></a>
-        <a href="https://www.linkedin.com/in/krishnaprasadkurmi7/"><small>LinkedIn</small><span>krishnaprasadkurmi7</span></a>
-        <a href="https://leetcode.com/u/kurmikrishna7/"><small>LeetCode</small><span>kurmikrishna7</span></a>
+        <a data-portfolio-href="person.email" href="mailto:krishnaprasadkurmi99@gmail.com"><small>Email</small><span data-portfolio="person.email">krishnaprasadkurmi99@gmail.com</span></a>
+        <a data-portfolio-href="person.github" href="https://github.com/krishnaprasadkurmi99-jpg"><small>GitHub</small><span data-portfolio="person.github">krishnaprasadkurmi99-jpg</span></a>
+        <a data-portfolio-href="person.linkedin" href="https://www.linkedin.com/in/krishnaprasadkurmi7/"><small>LinkedIn</small><span data-portfolio="person.linkedin">krishnaprasadkurmi7</span></a>
+        <a data-portfolio-href="person.leetcode" href="https://leetcode.com/u/kurmikrishna7/"><small>LeetCode</small><span data-portfolio="person.leetcode">kurmikrishna7</span></a>
       </section>
       <section class="resume-sidebar-section" aria-labelledby="resume-skills-title">
         <h2 id="resume-skills-title">Skills</h2>
-        <div class="resume-skill-group"><h3>Programming</h3><p>C, C++, Python, JavaScript, TypeScript</p></div>
-        <div class="resume-skill-group"><h3>Web &amp; Backend</h3><p>React, Next.js, Node.js, Express.js, FastAPI, Flask</p></div>
-        <div class="resume-skill-group"><h3>Data</h3><p>MongoDB, MySQL, SQLite, PostgreSQL</p></div>
-        <div class="resume-skill-group"><h3>Other</h3><p>HTML, CSS, Tailwind CSS, REST APIs, Data Structures &amp; Algorithms</p></div>
+        <div id="resume-skills"></div>
       </section>
     </aside>
     <div class="resume-main">
       <section class="resume-section" aria-labelledby="resume-summary-title">
         <h2 id="resume-summary-title">Profile</h2>
-        <p>Computer Science and Engineering student at BMS Institute of Technology &amp; Management, interested in backend development and reliable software systems. Building programming fundamentals through C and C++, learning Data Structures and Algorithms, and applying web and backend technologies in full-stack projects.</p>
+        <p id="resume-summary">Computer Science and Engineering student at BMS Institute of Technology &amp; Management, interested in backend development and reliable software systems.</p>
       </section>
       <section class="resume-section" aria-labelledby="resume-projects-title">
         <h2 id="resume-projects-title">Project Experience</h2>
@@ -49,13 +46,13 @@
       <section class="resume-section" aria-labelledby="resume-education-title">
         <h2 id="resume-education-title">Education</h2>
         <div class="resume-education">
-          <h3>BMS Institute of Technology &amp; Management</h3>
-          <p>Bachelor of Engineering, Computer Science &amp; Engineering</p>
-          <p>Third semester | Expected graduation: 2029</p>
+          <h3 data-portfolio="education.institution">BMS Institute of Technology &amp; Management</h3>
+          <p><span data-portfolio="education.degree">Bachelor of Engineering</span>, <span data-portfolio="education.branch">Computer Science &amp; Engineering</span></p>
+          <p><span data-portfolio="education.semester">Third semester</span> | Expected graduation: <span data-portfolio="education.expectedGraduation">2029</span></p>
         </div>
       </section>
     </div>
   </main>
-  <script src="script.js?v=20261103-resume"></script>
+  <script src="script.js?v=20261103-portfolio-data"></script>
 </body>
 </html>

@@ -22,6 +22,10 @@ No framework, build step, or backend service is required.
 
 Every page uses the shared responsive Bento Grid styling and a consistent navigation bar with regular HTML page links.
 
+## Keeping the Résumé Current
+
+Update the `portfolioData` object near the top of `script.js` to change the profile, contact details, education, or skills. The About, Skills, Education, Contact, and printable résumé sections read those shared values. Update the `projects` collection in the same file to change project details; only projects marked `Live` appear on the résumé.
+
 ## Run Locally
 
 1. Open the project folder in VS Code.
@@ -29,31 +33,23 @@ Every page uses the shared responsive Bento Grid styling and a consistent naviga
 3. Right-click `index.html`.
 4. Select **Open with Live Server**.
 
-The site can also be opened directly in a browser. All pages, styles, scripts, and images use relative paths for GitHub Pages compatibility.
+The site can also be opened directly in a browser. Pages, styles, scripts, and images use relative paths.
 
-## GitHub Pages Deployment
+## Cloudflare Workers Deployment
 
-1. Create a new GitHub repository, or select an existing repository for this portfolio.
-2. Place all seven HTML pages, `style.css`, `script.js`, `profile-photo.png`, `sitemap.xml`, and this `README.md` in the repository root.
-3. Confirm that `index.html` is directly at the root level, not inside another folder.
-4. Commit and push the files to the `main` branch using Git or upload them through GitHub.
-5. Open the repository's **Settings**.
-6. Select **Pages** in the sidebar.
-7. Under the deployment source, choose **Deploy from a branch**.
-8. Select the `main` branch and the `/ (root)` folder if available.
-9. Click **Save**.
-10. Wait for GitHub Pages to finish deploying.
-11. Open the generated Pages URL and test the website and its assets.
+The workflow in `.github/workflows/deploy.yml` deploys the static site to Cloudflare Workers whenever changes are pushed to `main`. It uses `wrangler.jsonc` and `.assetsignore` from the repository root.
 
-The published URL depends on the GitHub account name and repository name. Do not assume a URL until GitHub displays it.
+Before the first deployment:
 
-## Live Portfolio
+1. Commit `wrangler.jsonc` and `.assetsignore` along with the site files.
+2. In GitHub **Settings → Secrets and variables → Actions**, add `CLOUDFLARE_API_TOKEN` with permission to deploy Workers and `CLOUDFLARE_ACCOUNT_ID` for the Cloudflare account.
+3. Push to `main`, or run **Deploy portfolio** manually from the repository's **Actions** tab.
 
-**Pending deployment.** The live portfolio URL will be added after GitHub Pages is configured.
+The configured Worker URL is [krishna-portfolio.krishnaprasadkurmi99.workers.dev](https://krishna-portfolio.krishnaprasadkurmi99.workers.dev).
 
 ## Repository
 
-**Pending repository selection.** The repository URL will be added once the portfolio repository is known.
+[GitHub repository](https://github.com/krishnaprasadkurmi99-jpg/krishna-portfolio)
 
 ## Contact Form
 

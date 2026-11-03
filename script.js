@@ -2,7 +2,7 @@ const menuToggle = document.querySelector(".menu-toggle");
 const navLinks = document.querySelector(".nav-links");
 const header = document.querySelector(".site-header");
 const filterButtons = document.querySelectorAll(".filter-button");
-const skillCards = document.querySelectorAll(".skill-card");
+const skillCardGrid = document.querySelector(".skill-card-grid");
 const projectShowcase = document.querySelector("#project-showcase");
 const homeFeaturedProjects = document.querySelector("#home-featured-projects");
 const projectFilters = document.querySelectorAll(".project-filter");
@@ -10,9 +10,112 @@ const projectModal = document.querySelector("#project-modal");
 const modalCloseButtons = document.querySelectorAll("[data-modal-close]");
 const achievementGrid = document.querySelector("#achievement-grid");
 const resumeProjectList = document.querySelector("#resume-projects");
+const resumeSkillList = document.querySelector("#resume-skills");
 const backToTop = document.querySelector("#back-to-top");
 const modalFocusableSelector = "button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled])";
 let lastFocusedElement = null;
+
+const portfolioData = {
+  person: {
+    name: "Krishna Prasad Kurmi",
+    email: "krishnaprasadkurmi99@gmail.com",
+    github: "krishnaprasadkurmi99-jpg",
+    linkedin: "krishnaprasadkurmi7",
+    leetcode: "kurmikrishna7"
+  },
+  profile: {
+    aboutInterest: "I’m interested in backend development and in understanding how applications work behind the scenes. I enjoy working through programming fundamentals, breaking down problems, and learning how thoughtful logic can become reliable software.",
+    projectExperience: "applying web and backend technologies in full-stack projects",
+    learningApproach: "I’m still early in my journey, building it one concept, challenge, and project at a time."
+  },
+  education: {
+    institution: "BMS Institute of Technology & Management",
+    degree: "Bachelor of Engineering",
+    branch: "Computer Science & Engineering",
+    semester: "Third semester",
+    expectedGraduation: "2029",
+    programmingFocus: "C and C++",
+    currentFocus: "Data Structures and Algorithms",
+    careerInterest: "Backend Development"
+  },
+  skills: [
+    { name: "C", group: "Programming", category: "programming", categoryLabel: "PROGRAMMING", status: "Familiar", statusClass: "familiar", description: "Building a solid base in procedural programming and core programming logic.", icon: "C", iconClass: "icon-c" },
+    { name: "C++", group: "Programming", category: "programming", categoryLabel: "PROGRAMMING", status: "Familiar", statusClass: "familiar", description: "Strengthening object-oriented programming and problem-solving fundamentals.", icon: "C++", iconClass: "icon-cpp" },
+    { name: "Data Structures & Algorithms", group: "Fundamentals", category: "fundamentals", categoryLabel: "FUNDAMENTALS", status: "Learning", statusClass: "learning", description: "Learning how to organize data and approach problems with better logic.", icon: "DSA", iconClass: "icon-dsa" },
+    { name: "Problem Solving", group: "Fundamentals", category: "fundamentals", categoryLabel: "FUNDAMENTALS", status: "Developing", statusClass: "learning", description: "Practicing how to break larger challenges into clear, manageable steps.", icon: "◎", iconClass: "icon-problem" },
+    { name: "HTML, CSS & JavaScript", group: "Web Development", category: "web", categoryLabel: "WEB DEVELOPMENT", status: "Using", statusClass: "using", description: "Used to build this portfolio and web application interfaces.", icon: "WEB", iconClass: "icon-web" },
+    { name: "Git", group: "Tools", category: "tools", categoryLabel: "TOOLS & PLATFORMS", status: "Using", statusClass: "using", description: "Version control for tracking and managing project changes.", icon: "Git", iconClass: "icon-git" },
+    { name: "GitHub", group: "Tools", category: "tools", categoryLabel: "TOOLS & PLATFORMS", status: "Profile available", statusClass: "using", description: "Profile for sharing project work and learning progress.", icon: "GH", iconClass: "icon-github" },
+    { name: "VS Code", group: "Tools", category: "tools", categoryLabel: "TOOLS & PLATFORMS", status: "Using", statusClass: "using", description: "The editor used while learning, practicing, and building projects.", icon: "VS", iconClass: "icon-vscode" },
+    { name: "MongoDB", group: "Data", category: "databases", categoryLabel: "DATABASES", status: "Used in Projects", statusClass: "using", description: "Used in project work for application data storage and management.", icon: "DB", iconClass: "icon-mongodb" }
+  ]
+};
+
+const getPortfolioValue = (path) => {
+  if (path === "person.firstName") return portfolioData.person.name.trim().split(/\s+/)[0];
+  if (path === "person.role") return `${portfolioData.education.branch} Student`;
+  if (path === "education.degreeShort") return portfolioData.education.degree === "Bachelor of Engineering" ? "BE" : portfolioData.education.degree;
+  return path.split(".").reduce((value, key) => value?.[key], portfolioData);
+};
+
+const getPortfolioHref = (path) => {
+  const value = getPortfolioValue(path);
+  if (path === "person.email") return `mailto:${value}`;
+  if (path === "person.github") return `https://github.com/${value}`;
+  if (path === "person.linkedin") return `https://www.linkedin.com/in/${value}/`;
+  if (path === "person.leetcode") return `https://leetcode.com/u/${value}/`;
+  return value;
+};
+
+const renderPortfolioFields = () => {
+  document.querySelectorAll("[data-portfolio]").forEach((element) => {
+    const value = getPortfolioValue(element.dataset.portfolio);
+    if (value !== undefined) element.textContent = value;
+  });
+  document.querySelectorAll("[data-portfolio-href]").forEach((element) => {
+    const value = getPortfolioHref(element.dataset.portfolioHref);
+    if (value !== undefined) element.setAttribute("href", value);
+  });
+  document.querySelectorAll(".footer-copy > span").forEach((element) => {
+    element.textContent = `CSE Student | Class of ${portfolioData.education.expectedGraduation}`;
+  });
+  const aboutLead = document.querySelector("#about-story-lead");
+  if (aboutLead) {
+    aboutLead.textContent = `I’m ${portfolioData.person.firstName}, a ${portfolioData.education.semester.toLowerCase()} ${portfolioData.education.branch} student at ${portfolioData.education.institution}.`;
+  }
+  const aboutFocus = document.querySelector("#about-focus");
+  if (aboutFocus) {
+    aboutFocus.textContent = `Right now, I’m strengthening ${portfolioData.education.programmingFocus} while learning ${portfolioData.education.currentFocus} through practice. ${portfolioData.profile.learningApproach}`;
+  }
+  const resumeSummary = document.querySelector("#resume-summary");
+  if (resumeSummary) {
+    resumeSummary.textContent = `${portfolioData.education.branch} student at ${portfolioData.education.institution}, interested in ${portfolioData.education.careerInterest.toLowerCase()}. Building programming fundamentals through ${portfolioData.education.programmingFocus}, learning ${portfolioData.education.currentFocus}, and ${portfolioData.profile.projectExperience}.`;
+  }
+}
+
+const renderSkillCards = () => {
+  if (!skillCardGrid) return;
+  skillCardGrid.innerHTML = portfolioData.skills.map((skill) => `
+    <article class="skill-card" data-category="${skill.category}">
+      <span class="skill-card-icon ${skill.iconClass}" aria-hidden="true">${skill.icon}</span>
+      <div class="skill-card-heading"><p class="skill-card-label">${skill.categoryLabel}</p><span class="status-badge status-${skill.statusClass}">${skill.status}</span></div>
+      <h3>${skill.name}</h3><p>${skill.description}</p>
+    </article>
+  `).join("");
+}
+
+const renderResumeSkills = () => {
+  if (!resumeSkillList) return;
+  const groups = portfolioData.skills.reduce((result, skill) => {
+    if (skill.statusClass === "planned") return result;
+    result[skill.group] ??= [];
+    result[skill.group].push(skill.name);
+    return result;
+  }, {});
+  resumeSkillList.innerHTML = Object.entries(groups).map(([group, skills]) => `
+    <div class="resume-skill-group"><h3>${group}</h3><p>${skills.join(", ")}</p></div>
+  `).join("");
+}
 
 // Add verified achievements here when they become available.
 const achievements = [];
@@ -259,6 +362,9 @@ const closeProjectModal = () => {
 };
 
 renderFeaturedProjects();
+renderPortfolioFields();
+renderSkillCards();
+renderResumeSkills();
 renderResumeProjects();
 renderProjects();
 renderAchievements();
@@ -343,7 +449,7 @@ filterButtons.forEach((button) => {
       filterButton.setAttribute("aria-pressed", String(isActive));
     });
 
-    skillCards.forEach((card) => {
+    document.querySelectorAll(".skill-card").forEach((card) => {
       const shouldShow = selectedFilter === "all" || card.dataset.category === selectedFilter;
       card.classList.toggle("is-hidden", !shouldShow);
     });
